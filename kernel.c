@@ -2,6 +2,7 @@
 
 #include <uart.h>
 #include <asm.h>
+#include <timer.h>
 
 #define STACK_SIZE 256
 #define TASK_LIMIT 16
@@ -42,11 +43,20 @@ int main(void) {
 	size_t task_count = 0;
 	size_t cur_task = 0;
 
+	*TIMER0 = 1000000;
+	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
+
 	tasks[0] = init_task(stacks[0], user_first);
 
 	task_count = 1;
 
 	while (1) {
+		if (!*(TIMER0 + TIMER_VALUE)) {
+			uart_puts("tick\n");
+			*TIMER0 = 1000000;
+			*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
+		}
+
 		tasks[cur_task] = activate(tasks[cur_task]);
 
 		/* Process sycalls */
