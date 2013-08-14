@@ -1,8 +1,18 @@
 #include <uart.h>
 #include <asm.h>
 
-unsigned int stacks[2][256];
-unsigned int *tasks[2];
+#define STACK_SIZE 256
+#define TASK_LIMIT 2
+
+unsigned int stacks[TASK_LIMIT][STACK_SIZE];
+unsigned int *tasks[TASK_LIMIT];
+
+unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
+	stack += STACK_SIZE - 16;
+	stack[0] = 0x10; /* User mode, interrupts on */
+	stack[1] = (unsigned int)start;
+	return stack;
+}
 
 void user_first(void) {
 	uart_puts("In user mode\n");
@@ -17,13 +27,8 @@ void task(void) {
 }
 
 int main(void) {
-	tasks[0] = stacks[0] + 256 - 16;
-	tasks[0][0] = 0x10;
-	tasks[0][1] = (unsigned int)&user_first;
-
-	tasks[1] = stacks[1] + 256 - 16;
-	tasks[1][0] = 0x10;
-	tasks[1][1] = (unsigned int)&task;
+	tasks[0] = init_task(stacks[0], user_first);
+	tasks[1] = init_task(stacks[1], task);
 
 	activate(tasks[0]);
 	activate(tasks[1]);
