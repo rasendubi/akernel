@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include <uart.h>
 #include <asm.h>
 
@@ -27,13 +29,21 @@ void task(void) {
 }
 
 int main(void) {
+	size_t task_count = 0;
+	size_t cur_task = 0;
+
 	tasks[0] = init_task(stacks[0], user_first);
 	tasks[1] = init_task(stacks[1], task);
 
-	activate(tasks[0]);
-	activate(tasks[1]);
+	task_count = 2;
 
-	while (1);
+	while (1) {
+		tasks[cur_task] = activate(tasks[cur_task]);
+		++cur_task;
+		if (cur_task >= task_count)
+			cur_task = 0;
+	}
+
 	return 0;
 }
 
