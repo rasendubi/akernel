@@ -3,6 +3,7 @@
 
 unsigned int *activate(unsigned int *stack);
 
-void syscall(void);
+void yield(void);
+int fork(void);
 
 #endif /* ASM_H */
