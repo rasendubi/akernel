@@ -1,12 +1,9 @@
-#define UART0 ((volatile char *)0x10009000)
+#include <uart.h>
 
 int main(void) {
-	char *string = "Hello, world!\n";
-	while (*string) {
-		*UART0 = *string;
-		string++;
-	}
+	uart_puts("Hello, world!\n");
 
 	while (1);
 	return 0;
 }
+
