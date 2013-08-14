@@ -3,6 +3,7 @@
 #include <uart.h>
 #include <asm.h>
 #include <timer.h>
+#include <gic.h>
 
 #define STACK_SIZE 256
 #define TASK_LIMIT 16
@@ -29,34 +30,32 @@ void *memcpy(void *dest, const void *src, size_t n) {
 
 void task(void) {
 	uart_puts("In other task\n");
-	while (1) yield();
+	while (1);
 }
 
 void user_first(void) {
 	uart_puts("In user mode\n");
 	if (!fork()) task();
 	uart_puts("In user mode again\n");
-	while (1) yield();
+	while (1);
 }
 
 int main(void) {
 	size_t task_count = 0;
 	size_t cur_task = 0;
 
+	init_int();
+	enable_timer_int();
+
 	*TIMER0 = 1000000;
-	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
+	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
+		TIMER_INTEN;
 
 	tasks[0] = init_task(stacks[0], user_first);
 
 	task_count = 1;
 
 	while (1) {
-		if (!*(TIMER0 + TIMER_VALUE)) {
-			uart_puts("tick\n");
-			*TIMER0 = 1000000;
-			*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
-		}
-
 		tasks[cur_task] = activate(tasks[cur_task]);
 
 		/* Process sycalls */
@@ -77,6 +76,14 @@ int main(void) {
 				tasks[cur_task][2+0] = task_count;
 				tasks[task_count][2+0] = 0;
 				++task_count;
+			}
+			break;
+		case -36: /* Timer 0 or 1 went off */
+			if (*(TIMER0 + TIMER_MIS)) {
+				*(TIMER0 + TIMER_INTCLR) = 1;
+				uart_puts("tick\n");
+			} else {
+				--cur_task;
 			}
 			break;
 		default:
