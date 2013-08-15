@@ -82,9 +82,8 @@ int main(void) {
 			if (*(TIMER0 + TIMER_MIS)) {
 				*(TIMER0 + TIMER_INTCLR) = 1;
 				uart_puts("tick\n");
-			} else {
-				--cur_task;
 			}
+			*(GIC0_INT_END) = 36;
 			break;
 		default:
 			uart_puts("Unknown syscall!!!");

@@ -36,9 +36,7 @@ irq_entry:
 	push {r8}
 	ldr r8, GIC0
 	ldr r7, [r8, #0x00C]
-	str r7, [r8, #0x010]
 	GIC0: .word 0x1E000000
-
 
 	ldr r8, MASK
 	and r7, r7, r8
@@ -46,9 +44,6 @@ irq_entry:
 	sub r7, r8, r7
 	pop {r8}
 	MASK: .word 1023
-
-
-	/* sub r7, r7, #31 */
 
 	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
 	mov r0, sp
