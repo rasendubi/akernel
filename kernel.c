@@ -45,7 +45,8 @@ int main(void) {
 	size_t cur_task = 0;
 
 	init_int();
-	enable_timer_int();
+	int_enable();
+	enable_timer0_int();
 
 	*TIMER0 = 1000000;
 	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
@@ -83,7 +84,7 @@ int main(void) {
 				*(TIMER0 + TIMER_INTCLR) = 1;
 				uart_puts("tick\n");
 			}
-			*(GIC0_INT_END) = 36;
+			int_end(36);
 			break;
 		default:
 			uart_puts("Unknown syscall!!!");
