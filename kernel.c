@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include <uart.h>
+#include <user.h>
 #include <asm.h>
 #include <timer.h>
 #include <gic.h>
@@ -26,18 +27,6 @@ void *memcpy(void *dest, const void *src, size_t n) {
 		d[i] = s[i];
 	}
 	return d;
-}
-
-void task(void) {
-	uart_puts("In other task\n");
-	while (1);
-}
-
-void user_first(void) {
-	uart_puts("In user mode\n");
-	if (!fork()) task();
-	uart_puts("In user mode again\n");
-	while (1);
 }
 
 int main(void) {
