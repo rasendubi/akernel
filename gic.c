@@ -14,9 +14,7 @@
 void init_int(void) {
 	*(GIC0_CPU_CONTROL) = 1;
 	*(GIC0_PRIORITY_MASK) = 0xF << 4;;
-}
 
-void int_enable(void) {
 	*GIC0_DIST_CONTROL = 1;
 }
 
