@@ -7,6 +7,10 @@
 #define STACK_SIZE 256
 #define TASK_LIMIT 16
 
+#define TASK_READY      0
+#define TASK_WAIT_READ  1
+#define TASK_WAIT_WRITE 2
+
 static unsigned int stacks[TASK_LIMIT][STACK_SIZE];
 static unsigned int *tasks[TASK_LIMIT];
 
@@ -36,12 +40,15 @@ void add_task(void (*start)(void)) {
 }
 
 void schedule(void) {
-	++cur_task;
-	if (cur_task == task_count) {
-		cur_task = 0;
-	}
+	do {
+		++cur_task;
+		if (cur_task == task_count) {
+			cur_task = 0;
+		}
+	} while (tasks[cur_task][-1] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
+	tasks[cur_task][-1] = TASK_READY;
 }
 
 unsigned get_preempt_reason(void) {
