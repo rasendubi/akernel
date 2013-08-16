@@ -1,4 +1,5 @@
 #include <gic.h>
+#include <pipe.h>
 #include <scheduler.h>
 #include <timer.h>
 #include <uart.h>
@@ -11,6 +12,8 @@ int main(void) {
 	*TIMER0 = 1000000;
 	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
 		TIMER_INTEN;
+
+	pipe_init();
 
 	add_task(&user_first);
 
@@ -25,6 +28,12 @@ int main(void) {
 			break;
 		case 0x2: /* getpid */
 			handle_getpid();
+			break;
+		case 0x3: /* write */
+			handle_write(tasks[cur_task]);
+			break;
+		case 0x4: /* read */
+			handle_read(tasks[cur_task]);
 			break;
 
 		case -36: /* Timer 0 or 1 went off */

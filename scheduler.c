@@ -4,18 +4,13 @@
 
 #include <asm.h>
 
-#define STACK_SIZE 256
-#define TASK_LIMIT 16
-
-#define TASK_READY      0
-#define TASK_WAIT_READ  1
-#define TASK_WAIT_WRITE 2
+#define STACK_SIZE 1024
 
 static unsigned int stacks[TASK_LIMIT][STACK_SIZE];
-static unsigned int *tasks[TASK_LIMIT];
+unsigned int *tasks[TASK_LIMIT];
 
-static size_t cur_task = -1;
-static size_t task_count = 0;
+size_t cur_task = -1;
+size_t task_count = 0;
 
 static void *memcpy(void *dest, const void *src, size_t n) {
 	char *d = dest;
@@ -41,10 +36,7 @@ void add_task(void (*start)(void)) {
 
 void schedule(void) {
 	do {
-		++cur_task;
-		if (cur_task == task_count) {
-			cur_task = 0;
-		}
+		cur_task = (cur_task + 1)%task_count;
 	} while (tasks[cur_task][-1] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
@@ -52,24 +44,24 @@ void schedule(void) {
 }
 
 unsigned get_preempt_reason(void) {
-	return tasks[cur_task][2+7];
+	return tasks[cur_task][r7];
 }
 
 void handle_fork(void) {
 	if (task_count == TASK_LIMIT) {
-		tasks[cur_task][2+0] = -1;
+		tasks[cur_task][r0] = -1;
 	} else {
 		size_t used = stacks[cur_task] + STACK_SIZE - tasks[cur_task];
 		tasks[task_count] = stacks[task_count] + STACK_SIZE - used;
 		memcpy(tasks[task_count], tasks[cur_task],
 				used*sizeof(*tasks[cur_task]));
-		tasks[cur_task][2+0] = task_count;
-		tasks[task_count][2+0] = 0;
+		tasks[cur_task][r0] = task_count;
+		tasks[task_count][r0] = 0;
 		++task_count;
 	}
 }
 
 void handle_getpid(void) {
-	tasks[cur_task][2+0] = cur_task;
+	tasks[cur_task][r0] = cur_task;
 }
 

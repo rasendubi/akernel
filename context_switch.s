@@ -1,3 +1,4 @@
+.type activate, %function
 .global activate
 activate:
 	mov ip, sp
