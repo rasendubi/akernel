@@ -64,7 +64,6 @@ int main(void) {
 		case 0x0: /* yield */
 			break;
 		case 0x1: /* fork */
-			uart_puts("fork!\n");
 			if (task_count == TASK_LIMIT) {
 				tasks[cur_task][2+0] = -1;
 			} else {
@@ -78,6 +77,9 @@ int main(void) {
 				tasks[task_count][2+0] = 0;
 				++task_count;
 			}
+			break;
+		case 0x2: /* getpid */
+			tasks[cur_task][2+0] = cur_task;
 			break;
 		case -36: /* Timer 0 or 1 went off */
 			if (*(TIMER0 + TIMER_MIS)) {

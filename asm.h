@@ -8,5 +8,6 @@ void enable_timer_int(void);
 
 void yield(void);
 int fork(void);
+int getpid(void);
 
 #endif /* ASM_H */
