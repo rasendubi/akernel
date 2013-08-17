@@ -3,10 +3,11 @@
 #include <stddef.h>
 
 #include <asm.h>
+#include <page_alloc.h>
 
-#define STACK_SIZE 1024
+#define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
-static unsigned int stacks[TASK_LIMIT][STACK_SIZE];
+static unsigned int *stacks[TASK_LIMIT];
 unsigned int *tasks[TASK_LIMIT];
 
 size_t cur_task = -1;
@@ -30,6 +31,7 @@ static unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
 }
 
 void add_task(void (*start)(void)) {
+	tasks[task_count] = page_alloc(0);
 	tasks[task_count] = init_task(stacks[task_count], start);
 	++task_count;
 }
@@ -52,6 +54,7 @@ void handle_fork(void) {
 		tasks[cur_task][r0] = -1;
 	} else {
 		size_t used = stacks[cur_task] + STACK_SIZE - tasks[cur_task];
+		stacks[task_count] = page_alloc(0);
 		tasks[task_count] = stacks[task_count] + STACK_SIZE - used;
 		memcpy(tasks[task_count], tasks[cur_task],
 				used*sizeof(*tasks[cur_task]));
