@@ -24,7 +24,7 @@ static void *memcpy(void *dest, const void *src, size_t n) {
 }
 
 static unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
-	stack += STACK_SIZE - 16;
+	stack += STACK_SIZE - 17;
 	stack[0] = 0x10; /* User mode, interrupts on */
 	stack[1] = (unsigned int)start;
 	return stack;
