@@ -9,8 +9,6 @@
 #define TASK_WAIT_READ  1
 #define TASK_WAIT_WRITE 2
 
-void init_scheduler(void);
-
 void add_task(void (*start)(void));
 void schedule();
 

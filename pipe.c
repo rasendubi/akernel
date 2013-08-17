@@ -33,20 +33,17 @@ struct pipe_ringbuffer {
 
 struct pipe_ringbuffer pipes[PIPE_LIMIT];
 
-static void handle_read(unsigned *task);
-static void handle_write(unsigned *task);
+void handle_read(unsigned *task);
+void handle_write(unsigned *task);
 
 void init_pipes(void) {
 	size_t i;
 	for (i = 0; i < PIPE_LIMIT; ++i) {
 		pipes[i].start = pipes[i].end = 0;
 	}
-
-	register_svc(3, &handle_write);
-	register_svc(4, &handle_read);
 }
 
-static void handle_read(unsigned *task) {
+void handle_read(unsigned *task) {
 	struct pipe_ringbuffer *pipe;
 
 	task[STATE] = TASK_READY;
@@ -73,7 +70,7 @@ static void handle_read(unsigned *task) {
 	}
 }
 
-static void handle_write(unsigned *task) {
+void handle_write(unsigned *task) {
 	struct pipe_ringbuffer *pipe;
 
 	if (task[r0] > PIPE_LIMIT || task[r2] > PIPE_BUF) {

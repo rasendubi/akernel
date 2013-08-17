@@ -9,7 +9,6 @@
 int main(void) {
 	init_int();
 	init_page_alloc();
-	init_scheduler();
 	init_pipes();
 	enable_timer0_int();
 

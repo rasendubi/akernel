@@ -49,12 +49,12 @@ unsigned get_preempt_reason(void) {
 	return tasks[cur_task][r7];
 }
 
-static void handle_yield(unsigned *stack) {
+void handle_yield(unsigned *stack) {
 	stack[STATE] = TASK_READY;
 	return;
 }
 
-static void handle_fork(unsigned *stack) {
+void handle_fork(unsigned *stack) {
 	if (task_count == TASK_LIMIT) {
 		stack[r0] = -1;
 	} else {
@@ -69,13 +69,7 @@ static void handle_fork(unsigned *stack) {
 	}
 }
 
-static void handle_getpid(unsigned *stack) {
+void handle_getpid(unsigned *stack) {
 	stack[r0] = cur_task;
-}
-
-void init_scheduler(void) {
-	register_svc(0, &handle_yield);
-	register_svc(1, &handle_fork);
-	register_svc(2, &handle_getpid);
 }
 
