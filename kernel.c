@@ -1,4 +1,5 @@
 #include <gic.h>
+#include <page_alloc.h>
 #include <pipe.h>
 #include <scheduler.h>
 #include <timer.h>
@@ -13,6 +14,7 @@ int main(void) {
 	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
 		TIMER_INTEN;
 
+	init_page_alloc();
 	pipe_init();
 
 	add_task(&user_first);
