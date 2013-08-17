@@ -5,9 +5,6 @@
 
 #define PIPE_LIMIT (TASK_LIMIT*5)
 
-void pipe_init(void);
-
-void handle_read(unsigned *task);
-void handle_write(unsigned *task);
+void init_pipes(void);
 
 #endif /* PIPE_H */

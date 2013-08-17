@@ -1,9 +1,13 @@
+GIC0: .word 0x1E000000
+TASK_READY: .word 0
+
 .type activate, %function
 .global activate
 activate:
 	mov ip, sp
 	push {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
 
+	add r0, #4 /* skip STATE */
 	ldmfd r0!, {ip,lr}
 	msr SPSR, ip
 
@@ -24,12 +28,16 @@ svc_entry:
 
 	mrs ip, SPSR
 	stmfd r0!, {ip,lr}
+	ldr r4, TASK_READY
+	stmfd r0!, {r4}
+
+	push {r0}
+	bl handle_svc
+	pop {r0}
 
 	pop {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
 	mov sp, ip
 	bx lr
-
-GIC0: .word 0x1E000000
 
 .global irq_entry
 irq_entry:
@@ -51,6 +59,8 @@ irq_entry:
 	mrs ip, SPSR
 	sub lr, lr, #0x4
 	stmfd r0!, {ip,lr}
+	ldr r4, TASK_READY
+	stmfd r0!, {r4}
 
 	msr CPSR_c, #0xD3
 

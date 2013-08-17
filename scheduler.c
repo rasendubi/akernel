@@ -4,6 +4,7 @@
 
 #include <asm.h>
 #include <page_alloc.h>
+#include <svc.h>
 
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
@@ -24,9 +25,9 @@ static void *memcpy(void *dest, const void *src, size_t n) {
 }
 
 static unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
-	stack += STACK_SIZE - 16;
-	stack[0] = 0x10; /* User mode, interrupts on */
-	stack[1] = (unsigned int)start;
+	stack += STACK_SIZE - 17;
+	stack[CPSR] = 0x10; /* User mode, interrupts on */
+	stack[PC] = (unsigned int)start;
 	return stack;
 }
 
@@ -39,32 +40,42 @@ void add_task(void (*start)(void)) {
 void schedule(void) {
 	do {
 		cur_task = (cur_task + 1)%task_count;
-	} while (tasks[cur_task][-1] != TASK_READY);
+	} while (tasks[cur_task][STATE] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
-	tasks[cur_task][-1] = TASK_READY;
 }
 
 unsigned get_preempt_reason(void) {
 	return tasks[cur_task][r7];
 }
 
-void handle_fork(void) {
+static void handle_yield(unsigned *stack) {
+	stack[STATE] = TASK_READY;
+	return;
+}
+
+static void handle_fork(unsigned *stack) {
 	if (task_count == TASK_LIMIT) {
-		tasks[cur_task][r0] = -1;
+		stack[r0] = -1;
 	} else {
-		size_t used = stacks[cur_task] + STACK_SIZE - tasks[cur_task];
+		size_t used = stacks[cur_task] + STACK_SIZE - stack;
 		stacks[task_count] = page_alloc(0);
 		tasks[task_count] = stacks[task_count] + STACK_SIZE - used;
-		memcpy(tasks[task_count], tasks[cur_task],
-				used*sizeof(*tasks[cur_task]));
-		tasks[cur_task][r0] = task_count;
+		memcpy(tasks[task_count], stack,
+				used*sizeof(*stack));
+		stack[r0] = task_count;
 		tasks[task_count][r0] = 0;
 		++task_count;
 	}
 }
 
-void handle_getpid(void) {
-	tasks[cur_task][r0] = cur_task;
+static void handle_getpid(unsigned *stack) {
+	stack[r0] = cur_task;
+}
+
+void init_scheduler(void) {
+	register_svc(0, &handle_yield);
+	register_svc(1, &handle_fork);
+	register_svc(2, &handle_getpid);
 }
 
