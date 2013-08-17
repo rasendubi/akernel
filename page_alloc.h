@@ -5,7 +5,7 @@
 
 void init_page_alloc(void);
 
-void *page_alloc(int pages);
-void page_free(void *page_start, int pages);
+void *page_alloc(int level);
+void page_free(void *page_start, int level);
 
 #endif /* PAGE_ALLOC_H */
