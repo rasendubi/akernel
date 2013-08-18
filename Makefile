@@ -11,7 +11,7 @@ CPU=cortex-a8
 all: kernel.elf
 
 kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o syscalls.o gic.o user.o \
-		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o
+		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o print.o
 
 run: kernel.elf
 	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf
