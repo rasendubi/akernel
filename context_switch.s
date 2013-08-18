@@ -62,7 +62,15 @@ irq_entry:
 	ldr r4, TASK_READY
 	stmfd r0!, {r4}
 
-	msr CPSR_c, #0xD3
+	msr CPSR_c, #0xD3 /* Supervisor mode */
+
+	push {r0-r3}
+
+	ldr r8, =0x0
+	sub r0, r8, r7
+	bl handle_irq
+
+	pop {r0-r3}
 
 	pop {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
 	mov sp, ip

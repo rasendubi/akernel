@@ -1,18 +1,29 @@
 #include <gic.h>
+#include <irq.h>
 #include <page_alloc.h>
 #include <pipe.h>
 #include <scheduler.h>
 #include <timer.h>
-#include <uart.h>
 #include <user.h>
+
+static int timer_handler(unsigned unused) {
+	if (!*(TIMER0 + TIMER_MIS)) {
+		return 0;
+	}
+
+	*(TIMER0 + TIMER_INTCLR) = 1;
+	return 1;
+}
 
 int main(void) {
 	init_int();
 	init_page_alloc();
 	init_pipes();
+
+	register_isr(36, timer_handler);
 	enable_timer0_int();
 
-	*TIMER0 = 1000000;
+	*TIMER0 = 100000;
 	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
 		TIMER_INTEN;
 
@@ -20,21 +31,7 @@ int main(void) {
 	add_task(&user_first);
 
 	while (1) {
-		int reason;
 		schedule();
-
-		reason = (int)get_preempt_reason();
-		if (reason == -36) {
-			/* Timer 0 or 1 went off */
-			if (*(TIMER0 + TIMER_MIS)) {
-				*(TIMER0 + TIMER_INTCLR) = 1;
-			} else {
-				uart_puts("Error: Unknown timer tick\n");
-			}
-			int_end(36);
-		} else if (reason < 0) {
-			uart_puts("Error: Unknown preemption reason!\n");
-		}
 	}
 
 	return 0;
