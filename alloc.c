@@ -75,11 +75,14 @@ static free_struct *get_free_for(size_t size) {
 
 void *malloc(size_t size) {
 	if (size == 0) {
-		return 0;
+		return NULL;
 	}
 	size = max(size + sizeof(occupied_struct),
 			sizeof(free_struct));
 	free_struct *prev = get_free_for(size);
+	if (!prev->next) {
+		return NULL;
+	}
 	occupied_struct *occ = (occupied_struct *)prev->next;
 
 	size_t rest = prev->next->size - size;
