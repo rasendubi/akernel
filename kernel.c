@@ -7,6 +7,7 @@
 #include <user.h>
 
 static int timer_handler(unsigned unused) {
+	(void)unused;
 	if (!*(TIMER0 + TIMER_MIS)) {
 		return 0;
 	}
@@ -26,7 +27,6 @@ int main(void) {
 	*TIMER0 = 100000;
 	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
 		TIMER_INTEN;
-
 
 	add_task(&user_first);
 

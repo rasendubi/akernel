@@ -35,7 +35,7 @@ static void mark_dirty_in_level(int level, int entry) {
 }
 
 void init_page_alloc(void) {
-	unsigned kernel_end = &end_kernel;
+	unsigned kernel_end = (unsigned)&end_kernel;
 	for (size_t i = 0; i < kernel_end/PAGE_SIZE; ++i) {
 		mark_dirty(i);
 	}
