@@ -6,6 +6,8 @@
 
 #define NR_IRQS 128
 
+unsigned irq_stack[2048];
+
 typedef struct isr_struct {
 	int (*handler)(unsigned line);
 	struct isr_struct *next;
@@ -17,6 +19,8 @@ typedef struct irq_struct {
 } irq_struct;
 
 static irq_struct irqs[NR_IRQS];
+
+unsigned irq_level;
 
 void register_isr(unsigned line, int (*handler)(unsigned line)) {
 	isr_struct *isr = malloc(sizeof(isr_struct));

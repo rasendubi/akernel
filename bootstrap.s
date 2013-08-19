@@ -11,7 +11,11 @@ keep_loading:
 	cmp r1, r3
 	bne keep_loading
 
-	ldr sp, =0x07FFFFFF
+	msr CPSR_c, #0xD2 /* IRQ mode */
+	ldr sp, =irq_stack+8192
+
+	msr CPSR_c, #0xD3 /* Hypervisor mode */
+	ldr sp, =hyp_stack+8192
 	bl main
 
 interrupt_table:

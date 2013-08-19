@@ -3,8 +3,11 @@
 #include <stddef.h>
 
 #include <asm.h>
+#include <gic.h>
+#include <irq.h>
 #include <page_alloc.h>
 #include <svc.h>
+#include <timer.h>
 
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
@@ -37,12 +40,37 @@ void add_task(void (*start)(void)) {
 	++task_count;
 }
 
+#define NEED_RESCHED 1
+unsigned flags;
+
+static int timer_handler(unsigned unused) {
+	(void)unused;
+	if (!*(TIMER0 + TIMER_MIS)) {
+		return 0;
+	}
+
+	*(TIMER0 + TIMER_INTCLR) = 1;
+	flags |= NEED_RESCHED;
+	return 1;
+}
+
+void init_scheduler(void) {
+	register_isr(TIMER0_INT, timer_handler);
+	enable_int(TIMER0_INT);
+
+	*TIMER0 = 100000;
+	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
+		TIMER_INTEN;
+
+}
+
 void schedule(void) {
 	do {
 		cur_task = (cur_task + 1)%task_count;
 	} while (tasks[cur_task][STATE] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
+	flags &= ~NEED_RESCHED;
 }
 
 void handle_yield(unsigned *stack) {

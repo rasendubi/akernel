@@ -34,33 +34,70 @@ svc_entry:
 	bl handle_svc
 	pop {r0}
 
-	pop {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
+	pop {r4-r12,lr}
 	mov sp, ip
 	bx lr
 
 .global irq_entry
 irq_entry:
-	msr CPSR_c, #0xDF /* System mode */
-	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
-	mov r0, sp
-
-	msr CPSR_c, #0xD2 /* IRQ mode */
+	push {r0-r12}
 	mrs ip, SPSR
 	sub lr, lr, #0x4
-	ldr r4, TASK_READY
-	stmfd r0!, {r4,ip,lr}
+	push {ip,lr}
 
 	msr CPSR_c, #0xD3 /* Supervisor mode */
-	push {r0}
 
 	ldr r0, GIC0
 	ldr r0, [r0, #0x00C]
 
+	ldr r5, =irq_level
+	ldr r4, [r5]
+	add r4, r4, #1
+	str r4, [r5]
+
+	cpsie i
+
 	bl handle_irq
 
-	pop {r0}
+	cpsid i
 
-	pop {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
+	sub r4, r4, #1
+	str r4, [r5]
+	cmp r4, #0
+	bne back
+
+	ldr r6, =flags
+	ldr r6, [r6]
+	ands r6, r6, #1 /* NEED_RESCHED */
+	beq back
+
+	/* Resave state on user stack */
+	msr CPSR_c, #0xD2
+	pop {ip, lr}
+	msr SPSR, ip
+	pop {r0-r12}
+
+	push {r0}
+	msr CPSR_c, #0xDF
+	push {r1-r12,lr}
+	mov r0, sp
+	msr CPSR_c, #0xD2
+	pop {r1}
+	stmfd r0!, {r1}
+	mrs ip, SPSR
+	ldr r4, TASK_READY
+	stmfd r0!, {r4,ip,lr}
+
+	msr CPSR_c, #0xD3
+
+	pop {r4-r12,lr}
 	mov sp, ip
+	bx lr
+
+back:
+	msr CPSR_c, #0xD2 /* IRQ mode */
+	pop {ip, lr}
+	msr SPSR, ip
+	pop {r0-r12}
 	bx lr
 

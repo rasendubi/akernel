@@ -6,27 +6,13 @@
 #include <timer.h>
 #include <user.h>
 
-static int timer_handler(unsigned unused) {
-	(void)unused;
-	if (!*(TIMER0 + TIMER_MIS)) {
-		return 0;
-	}
-
-	*(TIMER0 + TIMER_INTCLR) = 1;
-	return 1;
-}
+unsigned hyp_stack[2048];
 
 int main(void) {
 	init_int();
 	init_page_alloc();
 	init_pipes();
-
-	register_isr(TIMER0_INT, timer_handler);
-	enable_int(TIMER0_INT);
-
-	*TIMER0 = 100000;
-	*(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_PERIODIC | TIMER_32BIT |
-		TIMER_INTEN;
+	init_scheduler();
 
 	add_task(&user_first);
 
