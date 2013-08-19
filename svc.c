@@ -9,9 +9,7 @@
 
 extern svc_handler *svc_handlers[];
 
-void handle_svc(unsigned *stack) {
-	unsigned int svc = stack[r7];
-
+void handle_svc(unsigned svc, unsigned *stack) {
 	tasks[cur_task] = stack;
 
 	if (svc >= SVC_COUNT) {

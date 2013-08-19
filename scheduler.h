@@ -12,8 +12,6 @@
 void add_task(void (*start)(void));
 void schedule();
 
-unsigned get_preempt_reason(void);
-
 extern unsigned int *tasks[];
 
 extern size_t cur_task;

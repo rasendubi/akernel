@@ -4,6 +4,7 @@ yield:
 	push {r7}
 	mov r7, #0x0
 	svc 0
+	pop {r7}
 	bx lr
 
 .type fork, %function
@@ -12,6 +13,7 @@ fork:
 	push {r7}
 	mov r7, #0x1
 	svc 0
+	pop {r7}
 	bx lr
 
 .type getpid, %function
@@ -20,6 +22,7 @@ getpid:
 	push {r7}
 	mov r7, #0x2
 	svc 0
+	pop {r7}
 	bx lr
 
 .type write, %function
@@ -28,6 +31,7 @@ write:
 	push {r7}
 	mov r7, #0x3
 	svc 0
+	pop {r7}
 	bx lr
 
 .type read, %function
@@ -36,7 +40,6 @@ read:
 	push {r7}
 	mov r7, #0x4
 	svc 0
+	pop {r7}
 	bx lr
-
-
 

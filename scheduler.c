@@ -25,7 +25,7 @@ static void *memcpy(void *dest, const void *src, size_t n) {
 }
 
 static unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
-	stack += STACK_SIZE - 17;
+	stack += STACK_SIZE - 16;
 	stack[CPSR] = 0x10; /* User mode, interrupts on */
 	stack[PC] = (unsigned int)start;
 	return stack;
@@ -43,10 +43,6 @@ void schedule(void) {
 	} while (tasks[cur_task][STATE] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
-}
-
-unsigned get_preempt_reason(void) {
-	return tasks[cur_task][r7];
 }
 
 void handle_yield(unsigned *stack) {
