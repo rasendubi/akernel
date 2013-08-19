@@ -41,4 +41,3 @@ void printa(const char *format, ...) {
 
 	va_end(va);
 }
-

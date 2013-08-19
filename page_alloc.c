@@ -75,4 +75,3 @@ void page_free(void *page_start, int level) {
 		base[entry_on_level/2] = PAGE_CLEAN;
 	}
 }
-

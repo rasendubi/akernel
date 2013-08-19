@@ -30,4 +30,3 @@ interrupt_table:
 	svc_entry_address: .word svc_entry
 	irq_entry_address: .word irq_entry
 interrupt_table_end:
-

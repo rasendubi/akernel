@@ -4,4 +4,3 @@
 void user_first(void);
 
 #endif /* USER_H */
-

@@ -65,12 +65,12 @@ void init_scheduler(void) {
 }
 
 void schedule(void) {
+	flags &= ~NEED_RESCHED;
 	do {
 		cur_task = (cur_task + 1)%task_count;
 	} while (tasks[cur_task][STATE] != TASK_READY);
 
 	tasks[cur_task] = activate(tasks[cur_task]);
-	flags &= ~NEED_RESCHED;
 }
 
 void handle_yield(unsigned *stack) {
@@ -96,4 +96,3 @@ void handle_fork(unsigned *stack) {
 void handle_getpid(unsigned *stack) {
 	stack[r0] = cur_task;
 }
-

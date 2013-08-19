@@ -7,25 +7,25 @@
 
 static void task(void) {
 	char message[200] = "Hello from task\n";
-	uart_puts("In other task\n");
+	printa("In other task\n");
 	write(0, message, 100);
 	while (1);
 }
 
 void alloc_test(void) {
-	uart_puts("Start allocation\n");
+	printa("Start allocation\n");
 	char *b1 = malloc(0);
 	char *b2 = malloc(4);
 	char *b3 = malloc(100);
 	char *b4 = malloc(100000);
 	char *b5 = malloc(1000000);
-	uart_puts("Allocated\n");
+	printa("Allocated\n");
 	free(b4);
 	free(b2);
 	free(b3);
 	free(b1);
 	free(b5);
-	uart_puts("Freed\n");
+	printa("Freed\n");
 	while (1);
 }
 
@@ -41,14 +41,12 @@ void print_test(void) {
 
 void user_first(void) {
 	char *buf = malloc(100);
-	uart_puts("In user mode\n");
+	printa("In user mode\n");
 	if (!fork()) task();
 	if (!fork()) alloc_test();
 	if (!fork()) print_test();
-	uart_puts("In user mode again\n");
+	printa("In user mode again\n");
 	read(0, buf, 100);
-	uart_puts("Message read: ");
-	uart_puts(buf);
+	printa("Message read: %s", buf);
 	while (1);
 }
-

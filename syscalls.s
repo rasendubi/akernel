@@ -42,4 +42,3 @@ read:
 	svc 0
 	pop {r7}
 	bx lr
-

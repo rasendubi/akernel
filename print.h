@@ -5,4 +5,3 @@ void printa(const char *format, ...)
 	__attribute__((format(printf, 1, 2)));
 
 #endif /* PRINT_H */
-

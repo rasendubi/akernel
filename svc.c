@@ -24,4 +24,3 @@ void handle_svc(unsigned svc, unsigned *stack) {
 
 	svc_handlers[svc](stack);
 }
-

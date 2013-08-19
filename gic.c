@@ -11,8 +11,8 @@
 #define GIC0_CLEAR_ENABLE0 ((volatile unsigned *)(GIC0_DIST_BASE + 0x184))
 
 void init_int(void) {
-	*(GIC0_CPU_CONTROL) = 1;
-	*(GIC0_PRIORITY_MASK) = 0xF << 4;;
+	*GIC0_CPU_CONTROL = 1;
+	*GIC0_PRIORITY_MASK = 0xF << 4;;
 
 	*GIC0_DIST_CONTROL = 1;
 }
@@ -30,4 +30,3 @@ void disable_int(unsigned n) {
 void int_end(unsigned n) {
 	*GIC0_INT_END = n;
 }
-

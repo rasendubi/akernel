@@ -50,4 +50,3 @@ void handle_irq(unsigned line) {
 	}
 	int_end(line);
 }
-

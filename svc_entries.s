@@ -5,4 +5,3 @@ svc_handlers:
 .word handle_getpid
 .word handle_write
 .word handle_read
-

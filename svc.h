@@ -14,4 +14,3 @@
 typedef void svc_handler(unsigned *stack);
 
 #endif /* SVC_H */
-

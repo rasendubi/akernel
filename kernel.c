@@ -1,9 +1,7 @@
 #include <gic.h>
-#include <irq.h>
 #include <page_alloc.h>
 #include <pipe.h>
 #include <scheduler.h>
-#include <timer.h>
 #include <user.h>
 
 unsigned hyp_stack[2048];
@@ -22,4 +20,3 @@ int main(void) {
 
 	return 0;
 }
-
