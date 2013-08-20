@@ -22,6 +22,29 @@ static irq_struct irqs[NR_IRQS];
 
 unsigned irq_level;
 
+int mask_irq(unsigned line) {
+	if (line == TIMER0_INT) {
+		return 0;
+	}
+
+	if (irqs[line].mask_count == 0) {
+		disable_int(line);
+	}
+	++irqs[line].mask_count;
+	return 1;
+}
+
+int unmask_irq(unsigned line) {
+	if (line == TIMER0_INT) {
+		return 0;
+	}
+
+	if (--irqs[line].mask_count == 0) {
+		enable_int(line);
+	}
+	return 1;
+}
+
 void register_isr(unsigned line, int (*handler)(unsigned line)) {
 	isr_struct *isr = malloc(sizeof(isr_struct));
 	if (!isr) {
