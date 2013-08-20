@@ -80,13 +80,12 @@ irq_entry:
 	/* Resave state on user stack */
 	msr CPSR_c, #0xDF /* System mode */
 	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
-	mov r0, r7
-	mov r1, sp
+	mov r0, sp
 	msr CPSR_c, #0xD2 /* IRQ mode */
 
 	mrs ip, SPSR
 	ldr r4, TASK_READY
-	stmfd r1!, {r4,ip,lr}
+	stmfd r0!, {r4,ip,lr}
 
 	msr CPSR_c, #0xD3 /* Supervisor mode */
 
