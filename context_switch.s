@@ -61,22 +61,23 @@ irq_entry:
 
 	cpsid i
 
+	msr CPSR_c, #0xD2 /* IRQ mode */
+	pop {ip, lr}
+	msr SPSR, ip
+
 	sub r4, r4, #1
 	str r4, [r5]
 	cmp r4, #0
-	bne back
+	popne {r0-r5,ip}
+	bxne lr
 
 	ldr r5, =flags
 	ldr r5, [r5]
 	ands r5, r5, #1 /* NEED_RESCHED */
-	beq back
+	pop {r0-r5,ip}
+	bxeq lr
 
 	/* Resave state on user stack */
-	msr CPSR_c, #0xD2
-	pop {ip, lr}
-	msr SPSR, ip
-	pop {r0-r5,ip}
-
 	push {r0}
 	msr CPSR_c, #0xDF
 	push {r1-r12,lr}
@@ -94,9 +95,3 @@ irq_entry:
 	mov sp, ip
 	bx lr
 
-back:
-	msr CPSR_c, #0xD2 /* IRQ mode */
-	pop {ip, lr}
-	msr SPSR, ip
-	pop {r0-r5,ip}
-	bx lr
