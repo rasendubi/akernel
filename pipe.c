@@ -33,8 +33,8 @@ struct pipe_ringbuffer {
 
 struct pipe_ringbuffer pipes[PIPE_LIMIT];
 
-void handle_read(unsigned *task);
-void handle_write(unsigned *task);
+void handle_read(task_struct *ts);
+void handle_write(task_struct *ts);
 
 void init_pipes(void) {
 	size_t i;
@@ -43,10 +43,11 @@ void init_pipes(void) {
 	}
 }
 
-void handle_read(unsigned *task) {
+void handle_read(task_struct *ts) {
 	struct pipe_ringbuffer *pipe;
+	unsigned *task = ts->stack;
 
-	task[STATE] = TASK_READY;
+	ts->state = TASK_READY;
 	if (task[r0] > PIPE_LIMIT || task[r2] > PIPE_BUF) {
 		task[r0] = -1;
 		return;
@@ -54,7 +55,7 @@ void handle_read(unsigned *task) {
 
 	pipe = &pipes[task[r0]];
 	if ((size_t)PIPE_LEN(*pipe) < task[r2]) {
-		task[STATE] = TASK_WAIT_READ;
+		ts->state = TASK_WAIT_READ;
 	} else {
 		size_t i;
 		char *buf = (char*)task[r1];
@@ -63,15 +64,16 @@ void handle_read(unsigned *task) {
 		}
 
 		for (i = 0; i < task_count; ++i) {
-			if (tasks[i][STATE] == TASK_WAIT_WRITE) {
-				handle_write(tasks[i]);
+			if (tasks[i].state == TASK_WAIT_WRITE) {
+				handle_write(&tasks[i]);
 			}
 		}
 	}
 }
 
-void handle_write(unsigned *task) {
+void handle_write(task_struct *ts) {
 	struct pipe_ringbuffer *pipe;
+	unsigned *task = ts->stack;
 
 	if (task[r0] > PIPE_LIMIT || task[r2] > PIPE_BUF) {
 		task[r0] = -1;
@@ -80,7 +82,7 @@ void handle_write(unsigned *task) {
 
 	pipe = &pipes[task[r0]];
 	if ((size_t)PIPE_BUF - PIPE_LEN(*pipe) < task[r2]) {
-		task[STATE] = TASK_WAIT_WRITE;
+		ts->state = TASK_WAIT_WRITE;
 	} else {
 		size_t i;
 		const char *buf = (const char *)task[r1];
@@ -89,8 +91,8 @@ void handle_write(unsigned *task) {
 		}
 
 		for (i = 0; i < task_count; ++i) {
-			if (tasks[i][STATE] == TASK_WAIT_READ) {
-				handle_read(tasks[i]);
+			if (tasks[i].state == TASK_WAIT_READ) {
+				handle_read(&tasks[i]);
 			}
 		}
 	}

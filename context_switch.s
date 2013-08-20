@@ -7,7 +7,6 @@ activate:
 	mov ip, sp
 	push {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
 
-	add r0, #4 /* skip STATE */
 	ldmfd r0!, {ip,lr}
 	msr SPSR, ip
 
@@ -27,8 +26,7 @@ svc_entry:
 	msr CPSR_c, #0xD3 /* Supervisor mode */
 
 	mrs ip, SPSR
-	ldr r4, TASK_READY
-	stmfd r1!, {r4,ip,lr}
+	stmfd r1!, {ip,lr}
 
 	push {r1}
 	bl handle_svc
@@ -84,8 +82,7 @@ irq_entry:
 	msr CPSR_c, #0xD2 /* IRQ mode */
 
 	mrs ip, SPSR
-	ldr r4, TASK_READY
-	stmfd r0!, {r4,ip,lr}
+	stmfd r0!, {ip,lr}
 
 	msr CPSR_c, #0xD3 /* Supervisor mode */
 

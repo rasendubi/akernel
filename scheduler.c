@@ -12,7 +12,7 @@
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
 static unsigned int *stacks[TASK_LIMIT];
-unsigned int *tasks[TASK_LIMIT];
+task_struct tasks[TASK_LIMIT];
 
 size_t cur_task = -1;
 size_t task_count = 0;
@@ -27,15 +27,18 @@ static void *memcpy(void *dest, const void *src, size_t n) {
 	return d;
 }
 
-static unsigned int *init_task(unsigned int *stack, void (*start)(void)) {
-	stack += STACK_SIZE - 16;
+static task_struct init_task(unsigned int *stack, void (*start)(void)) {
+	task_struct ts;
+	stack += STACK_SIZE - 15;
 	stack[CPSR] = 0x10; /* User mode, interrupts on */
 	stack[PC] = (unsigned int)start;
-	return stack;
+	ts.stack = stack;
+	ts.state = TASK_READY;
+	return ts;
 }
 
 void add_task(void (*start)(void)) {
-	tasks[task_count] = page_alloc(0);
+	stacks[task_count] = page_alloc(0);
 	tasks[task_count] = init_task(stacks[task_count], start);
 	++task_count;
 }
@@ -68,31 +71,35 @@ void schedule(void) {
 	flags &= ~NEED_RESCHED;
 	do {
 		cur_task = (cur_task + 1)%task_count;
-	} while (tasks[cur_task][STATE] != TASK_READY);
+	} while (tasks[cur_task].state != TASK_READY);
 
-	tasks[cur_task] = activate(tasks[cur_task]);
+	tasks[cur_task].stack = activate(tasks[cur_task].stack);
 }
 
-void handle_yield(unsigned *stack) {
-	stack[STATE] = TASK_READY;
+void handle_yield(task_struct *ts) {
+	(void)ts;
+	flags |= NEED_RESCHED;
 	return;
 }
 
-void handle_fork(unsigned *stack) {
+void handle_fork(task_struct *ts) {
+	unsigned *stack = ts->stack;
 	if (task_count == TASK_LIMIT) {
 		stack[r0] = -1;
 	} else {
 		size_t used = stacks[cur_task] + STACK_SIZE - stack;
 		stacks[task_count] = page_alloc(0);
-		tasks[task_count] = stacks[task_count] + STACK_SIZE - used;
-		memcpy(tasks[task_count], stack,
+		tasks[task_count].stack = stacks[task_count] + STACK_SIZE - used;
+		memcpy(tasks[task_count].stack, stack,
 				used*sizeof(*stack));
 		stack[r0] = task_count;
-		tasks[task_count][r0] = 0;
+		tasks[task_count].stack[r0] = 0;
+		tasks[task_count].state = ts->state;
 		++task_count;
 	}
 }
 
-void handle_getpid(unsigned *stack) {
+void handle_getpid(task_struct *ts) {
+	unsigned *stack = ts->stack;
 	stack[r0] = cur_task;
 }

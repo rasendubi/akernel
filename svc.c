@@ -10,7 +10,7 @@
 extern svc_handler *svc_handlers[];
 
 void handle_svc(unsigned svc, unsigned *stack) {
-	tasks[cur_task] = stack;
+	tasks[cur_task].stack = stack;
 
 	if (svc >= SVC_COUNT) {
 		uart_puts("Error: unknown SVC\n");
@@ -22,5 +22,5 @@ void handle_svc(unsigned svc, unsigned *stack) {
 		return;
 	}
 
-	svc_handlers[svc](stack);
+	svc_handlers[svc](&tasks[cur_task]);
 }
