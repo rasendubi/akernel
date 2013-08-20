@@ -40,7 +40,7 @@ svc_entry:
 
 .global irq_entry
 irq_entry:
-	push {r0-r12}
+	push {r0-r5,ip}
 	mrs ip, SPSR
 	sub lr, lr, #0x4
 	push {ip,lr}
@@ -66,16 +66,16 @@ irq_entry:
 	cmp r4, #0
 	bne back
 
-	ldr r6, =flags
-	ldr r6, [r6]
-	ands r6, r6, #1 /* NEED_RESCHED */
+	ldr r5, =flags
+	ldr r5, [r5]
+	ands r5, r5, #1 /* NEED_RESCHED */
 	beq back
 
 	/* Resave state on user stack */
 	msr CPSR_c, #0xD2
 	pop {ip, lr}
 	msr SPSR, ip
-	pop {r0-r12}
+	pop {r0-r5,ip}
 
 	push {r0}
 	msr CPSR_c, #0xDF
@@ -98,5 +98,5 @@ back:
 	msr CPSR_c, #0xD2 /* IRQ mode */
 	pop {ip, lr}
 	msr SPSR, ip
-	pop {r0-r12}
+	pop {r0-r5,ip}
 	bx lr
