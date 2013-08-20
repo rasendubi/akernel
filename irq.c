@@ -3,6 +3,7 @@
 #include <alloc.h>
 #include <gic.h>
 #include <print.h>
+#include <svc.h>
 
 #define NR_IRQS 128
 
@@ -45,6 +46,10 @@ int unmask_irq(unsigned line) {
 	return 1;
 }
 
+void handle_register_isr(task_struct *ts) {
+	register_isr(ts->stack[r0], (int (*)(unsigned))ts->stack[r1]);
+}
+
 void register_isr(unsigned line, int (*handler)(unsigned line)) {
 	isr_struct *isr = malloc(sizeof(isr_struct));
 	if (!isr) {
@@ -54,6 +59,10 @@ void register_isr(unsigned line, int (*handler)(unsigned line)) {
 
 	isr->handler = handler;
 	isr->next = irqs[line].isrs;
+	if (irqs[line].isrs == NULL) {
+		irqs[line].mask_count = 0;
+		enable_int(line);
+	}
 	irqs[line].isrs = isr;
 }
 

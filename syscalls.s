@@ -42,3 +42,12 @@ read:
 	svc 0
 	pop {r7}
 	bx lr
+
+.type sys_register_isr, %function
+.global sys_register_isr
+sys_register_isr:
+	push {r7}
+	mov r7, #0x5
+	svc 0
+	pop {r7}
+	bx lr

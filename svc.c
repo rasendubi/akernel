@@ -5,14 +5,13 @@
 #include <scheduler.h>
 #include <uart.h>
 
-#define SVC_COUNT 5
-
 extern svc_handler *svc_handlers[];
+extern svc_handler *end_svcs;
 
 void handle_svc(unsigned svc, unsigned *stack) {
 	tasks[cur_task].stack = stack;
 
-	if (svc >= SVC_COUNT) {
+	if (svc >= &end_svcs - svc_handlers) {
 		uart_puts("Error: unknown SVC\n");
 		stack[r0] = -1;
 		return;

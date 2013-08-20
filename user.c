@@ -5,6 +5,8 @@
 #include <print.h>
 #include <uart.h>
 
+static void irq_test(void);
+
 static void task(void) {
 	char message[200] = "Hello from task\n";
 	printa("In other task\n");
@@ -42,11 +44,27 @@ void print_test(void) {
 void user_first(void) {
 	char *buf = malloc(100);
 	printa("In user mode\n");
+	if (!fork()) irq_test();
 	if (!fork()) task();
 	if (!fork()) alloc_test();
 	if (!fork()) print_test();
 	printa("In user mode again\n");
 	read(0, buf, 100);
 	printa("Message read: %s", buf);
+	while (1);
+}
+
+static int ticks;
+static int user_isr(unsigned line) {
+	(void)line;
+	if (++ticks%8 == 0) {
+		printa("%x ticks\n", ticks);
+	}
+	return 0;
+}
+
+static void irq_test(void) {
+	ticks = 0;
+	sys_register_isr(36, &user_isr);
 	while (1);
 }
