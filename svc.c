@@ -8,7 +8,7 @@
 extern svc_handler *svc_handlers[];
 extern svc_handler *end_svcs;
 
-void handle_svc(unsigned svc, unsigned *stack) {
+void handle_svc(int svc, unsigned *stack) {
 	tasks[cur_task].stack = stack;
 
 	if (svc >= &end_svcs - svc_handlers) {

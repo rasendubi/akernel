@@ -7,7 +7,6 @@
 
 #define TASK_READY      0
 #define TASK_WAIT_READ  1
-#define TASK_WAIT_WRITE 2
 
 void init_scheduler(void);
 
