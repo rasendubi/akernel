@@ -26,14 +26,13 @@ void alloc_test(void) {
 	char *b2 = malloc(4);
 	char *b3 = malloc(100);
 	char *b4 = malloc(100000);
-	/* FIXME: unknown bug */
-	/* char *b5 = malloc(1000000); */
+	char *b5 = malloc(1000000);
 	printa("Allocated\n");
 	free(b4);
 	free(b2);
 	free(b3);
 	free(b1);
-	/* free(b5); */
+	free(b5);
 	printa("Freed\n");
 	while (1);
 }

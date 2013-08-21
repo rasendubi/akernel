@@ -15,6 +15,18 @@ extern unsigned end_kernel;
 
 static unsigned char page_status[2*MAX_PAGES];
 
+static int pages_on_level(unsigned level) {
+	return MAX_PAGES >> level;
+}
+
+static char *base_for_level(unsigned level) {
+	char *base = page_status;
+	for (unsigned i = 0; i < level; ++i) {
+		base += pages_on_level(i);
+	}
+	return base;
+}
+
 static void mark_dirty(const size_t page) {
 	size_t entry = page;
 	unsigned level = 0;
@@ -22,7 +34,8 @@ static void mark_dirty(const size_t page) {
 
 	while (level <= MAX_LEVEL && base[entry] == PAGE_CLEAN) {
 		base[entry] = PAGE_DIRTY;
-		base += MAX_PAGES >> level;
+		base += pages_on_level(level);
+		entry >>= 1;
 		++level;
 	}
 }
