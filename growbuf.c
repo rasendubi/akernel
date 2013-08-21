@@ -76,6 +76,6 @@ void grow_push(growbuf *gb, char c) {
 }
 
 size_t grow_len(growbuf *gb) {
-	return gb->n_pages*PAGE_SIZE - gb->first_pos -
+	return gb->last_pos == -1 ? 0 : gb->n_pages*PAGE_SIZE - gb->first_pos -
 		(PAGE_SIZE - gb->last_pos - 1);
 }

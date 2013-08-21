@@ -12,7 +12,7 @@ void handle_svc(int svc, unsigned *stack) {
 	tasks[cur_task].stack = stack;
 
 	if (svc >= &end_svcs - svc_handlers) {
-		uart_puts("Error: unknown SVC\n");
+		printa("Error: unknown SVC: %x\n", svc);
 		stack[r0] = -1;
 		return;
 	} else if (svc_handlers[svc] == NULL) {

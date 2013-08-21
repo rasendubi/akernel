@@ -2,6 +2,13 @@
 
 #include <page_alloc.h>
 
+#ifdef DEBUG_ALLOC
+	#include <print.h>
+	#define debug(...) printa(__VA_ARGS__)
+#else
+	#define debug(...) do {} while(0)
+#endif
+
 typedef struct free_struct {
 	size_t size;
 	struct free_struct *next;
@@ -74,7 +81,9 @@ static free_struct *get_free_for(size_t size) {
 }
 
 void *malloc(size_t size) {
+	debug("Allocated ");
 	if (size == 0) {
+		debug("0\n");
 		return NULL;
 	}
 	size = max(size + sizeof(occupied_struct),
@@ -96,11 +105,14 @@ void *malloc(size_t size) {
 		prev->next = new_free;
 	}
 	occ->size = size;
+	debug("%x-%x\n", (unsigned)occ, (unsigned)occ + size);
 	return (void *)((unsigned)occ + sizeof(*occ));
 }
 
 void free(void *addr) {
+	debug("Freed ");
 	if (addr == 0) {
+		debug("0\n");
 		return;
 	}
 
@@ -110,4 +122,5 @@ void free(void *addr) {
 	free_struct *free_region = (free_struct *)occ;
 	free_region->size = size;
 	add_free_region(free_region);
+	debug("%x-%x\n", occ, (unsigned)occ + size);
 }

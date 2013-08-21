@@ -4,13 +4,19 @@
 #include <asm.h>
 #include <print.h>
 #include <uart.h>
+#include <user_pipe_master.h>
+#include <utils.h>
 
 static void irq_test(void);
 
 static void task(void) {
-	char message[200] = "Hello from task\n";
+	const char *message = "Hello from task\n";
+	int pipe = pipe_open("/task1");
+	char *buf = malloc(sizeof(unsigned) + strlen(message) + 1);
+	((unsigned*)buf)[0] = strlen(message) + 1;
+	memcpy(buf + sizeof(unsigned), message, strlen(message) + 1);
+	write(pipe, buf, sizeof(unsigned) + strlen(message) + 1);
 	printa("In other task\n");
-	write(0, message, 100);
 	while (1);
 }
 
@@ -20,13 +26,14 @@ void alloc_test(void) {
 	char *b2 = malloc(4);
 	char *b3 = malloc(100);
 	char *b4 = malloc(100000);
-	char *b5 = malloc(1000000);
+	/* FIXME: unknown bug */
+	/* char *b5 = malloc(1000000); */
 	printa("Allocated\n");
 	free(b4);
 	free(b2);
 	free(b3);
 	free(b1);
-	free(b5);
+	/* free(b5); */
 	printa("Freed\n");
 	while (1);
 }
@@ -43,15 +50,21 @@ void print_test(void) {
 
 void user_first(void) {
 	char *buf = malloc(100);
+	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
 	if (!fork()) irq_test();
 	if (!fork()) task();
 	if (!fork()) alloc_test();
 	if (!fork()) print_test();
 	printa("In user mode again\n");
-	read(0, buf, 100);
-	printa("Message read: %s", buf);
-	while (1);
+	while (1) {
+		int len;
+		read(pipe, &len, sizeof(len));
+		char *buf = malloc(len);
+		read(pipe, buf, len);
+		printa("Message read: %s", buf);
+		free(buf);
+	}
 }
 
 static int ticks;

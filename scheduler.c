@@ -8,6 +8,7 @@
 #include <page_alloc.h>
 #include <svc.h>
 #include <timer.h>
+#include <utils.h>
 
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
@@ -16,16 +17,6 @@ task_struct tasks[TASK_LIMIT];
 
 size_t cur_task = -1;
 size_t task_count = 0;
-
-static void *memcpy(void *dest, const void *src, size_t n) {
-	char *d = dest;
-	const char *s = src;
-	size_t i;
-	for (i = 0; i < n; ++i) {
-		d[i] = s[i];
-	}
-	return d;
-}
 
 static task_struct init_task(unsigned int *stack, void (*start)(void)) {
 	task_struct ts;
