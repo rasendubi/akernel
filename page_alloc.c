@@ -19,23 +19,25 @@ static int pages_on_level(unsigned level) {
 	return MAX_PAGES >> level;
 }
 
-static char *base_for_level(unsigned level) {
-	char *base = page_status;
+static unsigned char *base_for_level(unsigned level) {
+	unsigned char *base = page_status;
 	for (unsigned i = 0; i < level; ++i) {
 		base += pages_on_level(i);
 	}
 	return base;
 }
 
+static size_t entry_on_level(size_t page, unsigned level) {
+	return page >> level;
+}
+
 static void mark_dirty(const size_t page) {
-	size_t entry = page;
-	unsigned level = 0;
 	unsigned char *base = page_status;
 
-	while (level <= MAX_LEVEL && base[entry] == PAGE_CLEAN) {
-		base[entry] = PAGE_DIRTY;
+	for (unsigned level = 0; level <= MAX_LEVEL &&
+			base[entry_on_level(page, level)] == PAGE_CLEAN; ++level) {
+		base[entry_on_level(page, level)] = PAGE_DIRTY;
 		base += pages_on_level(level);
-		entry >>= 1;
 		++level;
 	}
 }
@@ -56,12 +58,9 @@ void init_page_alloc(void) {
 }
 
 void *page_alloc(int level) {
-	unsigned char *base = page_status;
-	int level_entries = MAX_PAGES >> level;
-	for (int i = 0; i < level; ++i) {
-		base += MAX_PAGES >> i;
-	}
-	for (int i = 0; i < level_entries; ++i) {
+	unsigned char *base = base_for_level(level);
+	int entries_on_level = MAX_PAGES >> level;
+	for (int i = 0; i < entries_on_level; ++i) {
 		if (base[i] == PAGE_CLEAN) {
 			mark_dirty_in_level(level, i);
 			return (void*)((i << level)*PAGE_SIZE);
@@ -74,6 +73,7 @@ void handle_page_alloc(unsigned *stack) {
 	stack[r0] = (unsigned)page_alloc(stack[r0]);
 }
 
+/* TODO: Refactor this method */
 void page_free(void *page_start, int level) {
 	unsigned char *base = page_status;
 	int entry_on_level = ((unsigned)page_start/PAGE_SIZE) >> level;
