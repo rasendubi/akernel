@@ -1,53 +1,19 @@
-.type yield, %function
-.global yield
-yield:
+.macro syscall n, name
+.type \name, %function
+.global \name
+\name:
 	push {r7}
-	mov r7, #0x0
+	mov r7, \n
 	svc 0
 	pop {r7}
 	bx lr
+.endm
 
-.type fork, %function
-.global fork
-fork:
-	push {r7}
-	mov r7, #0x1
-	svc 0
-	pop {r7}
-	bx lr
-
-.type getpid, %function
-.global getpid
-getpid:
-	push {r7}
-	mov r7, #0x2
-	svc 0
-	pop {r7}
-	bx lr
-
-.type write, %function
-.global write
-write:
-	push {r7}
-	mov r7, #0x3
-	svc 0
-	pop {r7}
-	bx lr
-
-.type read, %function
-.global read
-read:
-	push {r7}
-	mov r7, #0x4
-	svc 0
-	pop {r7}
-	bx lr
-
-.type sys_register_isr, %function
-.global sys_register_isr
-sys_register_isr:
-	push {r7}
-	mov r7, #0x5
-	svc 0
-	pop {r7}
-	bx lr
+syscall #0x00, yield
+syscall #0x01, fork
+syscall #0x02, getpid
+syscall #0x03, write
+syscall #0x04, read
+syscall #0x05, sys_register_isr
+syscall #0x06, sys_page_alloc
+syscall #0x07, sys_page_free

@@ -49,7 +49,6 @@ void print_test(void) {
 }
 
 void user_first(void) {
-	char *buf = malloc(100);
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
 	if (!fork()) irq_test();

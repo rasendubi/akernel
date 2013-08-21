@@ -1,6 +1,7 @@
 #include <page_alloc.h>
 
 #include <stddef.h>
+#include <svc.h>
 
 #define MAX_ADDRESS 0x10000000
 #define MAX_PAGES (MAX_ADDRESS/PAGE_SIZE)
@@ -56,6 +57,10 @@ void *page_alloc(int level) {
 	return NULL;
 }
 
+void handle_page_alloc(unsigned *stack) {
+	stack[r0] = (unsigned)page_alloc(stack[r0]);
+}
+
 void page_free(void *page_start, int level) {
 	unsigned char *base = page_status;
 	int entry_on_level = ((unsigned)page_start/PAGE_SIZE) >> level;
@@ -74,4 +79,8 @@ void page_free(void *page_start, int level) {
 		base += MAX_PAGES >> level;
 		base[entry_on_level/2] = PAGE_CLEAN;
 	}
+}
+
+void handle_page_free(unsigned *stack) {
+	page_free((void*)stack[r0], stack[r1]);
 }

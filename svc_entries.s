@@ -7,4 +7,6 @@ svc_handlers:
 .word handle_write
 .word handle_read
 .word handle_register_isr
+.word handle_page_alloc
+.word handle_page_free
 end_svcs:
