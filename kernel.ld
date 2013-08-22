@@ -8,10 +8,14 @@ SECTIONS {
 	}
 	.data ALIGN (0x1000) : {
 		*(.data)
+		*(.rodata)
 	}
 	.bss ALIGN (0x1000) : {
 		*(COMMON)
 		*(.bss)
 	}
 	end_kernel = .;
+	.ramdisk ALIGN (0x1000) : {
+		*(.ramdisk)
+	}
 }

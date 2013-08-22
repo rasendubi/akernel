@@ -50,11 +50,24 @@ static void mark_dirty_in_level(int level, int entry) {
 	}
 }
 
+static size_t addr_to_page(void *addr) {
+	return (size_t)addr / PAGE_SIZE;
+}
+
+extern char _binary_ramdisk_tar_start;
+extern char _binary_ramdisk_tar_end;
 void init_page_alloc(void) {
 	unsigned kernel_end = (unsigned)&end_kernel;
 	for (size_t i = 0; i <= kernel_end/PAGE_SIZE; ++i) {
 		mark_dirty(i);
 	}
+
+	size_t ramdisk_first = addr_to_page(&_binary_ramdisk_tar_start);
+	size_t ramdisk_end = addr_to_page(&_binary_ramdisk_tar_end);
+	for (size_t page = ramdisk_first; page <= ramdisk_end; ++page) {
+		mark_dirty(page);
+	}
+
 }
 
 void *page_alloc(int level) {
