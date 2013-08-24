@@ -15,7 +15,7 @@ SECTIONS {
 		*(.bss)
 	}
 	end_kernel = .;
-	.ramdisk ALIGN (0x1000) : {
-		*(.ramdisk)
+	ramdisk ALIGN (0x1000) : {
+		*(ramdisk)
 	}
 }

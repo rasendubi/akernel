@@ -4,6 +4,7 @@
 #include <page_alloc.h>
 #include <pipe.h>
 #include <pipe_master.h>
+#include <print.h>
 #include <scheduler.h>
 #include <user.h>
 
@@ -19,7 +20,7 @@ void init_systems(void) {
 extern unsigned _binary_ramdisk_tar_start;
 
 int main(void) {
-	printa("In main %x\n", main);
+	printa("In main %x\n", (unsigned)main);
 	init_int();
 	init_page_alloc();
 	init_pipes();
@@ -29,7 +30,7 @@ int main(void) {
 	elf_object *obj = load_elf(a);
 
 	add_task(&init_systems);
-	add_task(obj->entry_point);
+	add_task((void (*)(void))obj->entry_point);
 
 	while (1) {
 		schedule();

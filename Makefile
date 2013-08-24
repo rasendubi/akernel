@@ -16,7 +16,7 @@ kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o syscalls.o gi
 		growbuf.o pipe_master.o user_pipe_master.o ramdisk.o exec_elf.o
 
 ramdisk.o: ramdisk.tar
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=.ramdisk
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=ramdisk
 
 ramdisk.tar: stupid
 	tar cf $@ $^
@@ -27,7 +27,7 @@ run: kernel.elf
 	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf
 
 clean:
-	rm -f *.o *.elf *.tar
+	rm -f *.o *.elf *.tar stupid
 
 .SUFFIXES: .o .elf
 .o.elf:

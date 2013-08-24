@@ -1,3 +1,5 @@
+#include <uart.h>
+
 volatile int glob = 10,
 	 a = 5, b = 4;
 

@@ -139,8 +139,8 @@ elf_object *load_elf(void *start) {
 
 	elf_object *obj = malloc(sizeof(*obj));
 	obj->base_address = page_alloc(order);
-	obj->entry_point = (unsigned)elf_header->e_entry - start_empty +
-		(unsigned)obj->base_address;
+	obj->entry_point = (void (*)(void))((unsigned)elf_header->e_entry - start_empty +
+		(unsigned)obj->base_address);
 	obj->order = order;
 
 	program_header = on_offset(start, elf_header->e_phoff);
@@ -155,8 +155,8 @@ elf_object *load_elf(void *start) {
 		unsigned to_size = program_header->p_memsz;
 
 		char *from = on_offset(start, program_header->p_offset);
-		char *to = (unsigned)obj->base_address - start_empty +
-			(unsigned)program_header->p_vaddr;
+		char *to = (void*)((unsigned)obj->base_address - start_empty +
+			(unsigned)program_header->p_vaddr);
 
 		for (; from_size; --from_size, --to_size) {
 			*to = *from;

@@ -2,7 +2,7 @@
 #define EXEC_ELF_H
 
 typedef struct elf_object {
-	void *entry_point;
+	void (*entry_point)(void);
 	void *base_address;
 	unsigned order;
 } elf_object;

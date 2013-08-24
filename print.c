@@ -19,9 +19,9 @@ static void print_hex(unsigned number, int upper) {
 void dump_region(void *start, unsigned size) {
 	unsigned line = 32;
 	char *t = start;
-	for (int i = 0; i < size; ++i) {
+	for (unsigned i = 0; i < size; ++i) {
 		if (i % line == 0) {
-			printa("\n%x\t ", t + i);
+			printa("\n%x\t ", (unsigned)t + i);
 		}
 		print_hex_digit((t[i] >> 4) & 0xf, 0);
 		print_hex_digit(t[i] & 0xf, 0);
