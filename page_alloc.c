@@ -38,7 +38,6 @@ static void mark_dirty(const size_t page) {
 			base[entry_on_level(page, level)] == PAGE_CLEAN; ++level) {
 		base[entry_on_level(page, level)] = PAGE_DIRTY;
 		base += pages_on_level(level);
-		++level;
 	}
 }
 

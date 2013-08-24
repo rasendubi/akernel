@@ -16,6 +16,20 @@ static void print_hex(unsigned number, int upper) {
 	}
 }
 
+void dump_region(void *start, unsigned size) {
+	unsigned line = 32;
+	char *t = start;
+	for (int i = 0; i < size; ++i) {
+		if (i % line == 0) {
+			printa("\n%x\t ", t + i);
+		}
+		print_hex_digit((t[i] >> 4) & 0xf, 0);
+		print_hex_digit(t[i] & 0xf, 0);
+		printa(" ");
+	}
+	printa("\n");
+}
+
 void printa(const char *format, ...) {
 	va_list va;
 	va_start(va, format);

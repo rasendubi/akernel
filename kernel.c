@@ -1,4 +1,5 @@
 #include <asm.h>
+#include <exec_elf.h>
 #include <gic.h>
 #include <page_alloc.h>
 #include <pipe.h>
@@ -25,11 +26,10 @@ int main(void) {
 	init_scheduler();
 
 	unsigned *a = &_binary_ramdisk_tar_start + 0x200/4;
-	printa("%x: %s\n", &_binary_ramdisk_tar_start,
-			&_binary_ramdisk_tar_start);
-	printa("%x: %s\n", a, a);
+	elf_object *obj = load_elf(a);
 
 	add_task(&init_systems);
+	add_task(obj->entry_point);
 
 	while (1) {
 		schedule();

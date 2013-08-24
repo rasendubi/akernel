@@ -1,3 +1,8 @@
+#include <exec_elf.h>
+
+#include <alloc.h>
+#include <page_alloc.h>
+
 /* e_ident */
 #define EI_MAG0    0
 #define EI_MAG1    1
@@ -76,3 +81,95 @@ typedef struct Elf32_Phdr {
 	unsigned       p_flags;
 	unsigned       p_align;
 } Elf32_Phdr;
+
+static inline int check_magic(unsigned char ident[]) {
+	return ident[EI_MAG0] == ELFMAG0 &&
+		ident[EI_MAG1] == ELFMAG1 &&
+		ident[EI_MAG2] == ELFMAG2 &&
+		ident[EI_MAG3] == ELFMAG3;
+}
+
+static inline void *on_offset(void *base, unsigned offset) {
+	return (void *)((unsigned)base + offset);
+}
+
+static inline unsigned min(unsigned a, unsigned b) {
+	return a < b ? a : b;
+}
+
+static inline unsigned max(unsigned a, unsigned b) {
+	return a > b ? a : b;
+}
+
+elf_object *load_elf(void *start) {
+	Elf32_Ehdr *elf_header = start;
+	if (!check_magic(elf_header->e_ident)) {
+		return 0;
+	}
+
+	Elf32_Phdr *program_header = on_offset(start, elf_header->e_phoff);
+	unsigned max_image_addr = 0x00000000;
+	unsigned min_image_addr = 0xffffffff;
+	for (int i = 0; i < elf_header->e_phnum; ++i) {
+		if (program_header->p_type != PT_LOAD) {
+			program_header = on_offset(program_header,
+					elf_header->e_phentsize);
+			continue;
+		}
+
+		min_image_addr = min(min_image_addr, (unsigned)program_header->p_vaddr);
+		max_image_addr = max(max_image_addr, (unsigned)program_header->p_vaddr +
+				program_header->p_memsz);
+
+		program_header = on_offset(program_header,
+				elf_header->e_phentsize);
+	}
+
+	unsigned min_start_page = min_image_addr/PAGE_SIZE;
+	unsigned max_end_page = (max_image_addr - 1)/PAGE_SIZE + 1;
+	unsigned page_count = max_end_page - min_start_page + 1;
+	unsigned start_empty = min_start_page * PAGE_SIZE;
+
+	unsigned tmp = page_count >> 1;
+	unsigned order = 0;
+	while (tmp) {
+		tmp >>= 1;
+		++order;
+	}
+
+	elf_object *obj = malloc(sizeof(*obj));
+	obj->base_address = page_alloc(order);
+	obj->entry_point = (unsigned)elf_header->e_entry - start_empty +
+		(unsigned)obj->base_address;
+	obj->order = order;
+
+	program_header = on_offset(start, elf_header->e_phoff);
+	for (int i = 0; i < elf_header->e_phnum; ++i) {
+		if (program_header->p_type != PT_LOAD) {
+			program_header = on_offset(program_header,
+					elf_header->e_phentsize);
+			continue;
+		}
+
+		unsigned from_size = program_header->p_filesz;
+		unsigned to_size = program_header->p_memsz;
+
+		char *from = on_offset(start, program_header->p_offset);
+		char *to = (unsigned)obj->base_address - start_empty +
+			(unsigned)program_header->p_vaddr;
+
+		for (; from_size; --from_size, --to_size) {
+			*to = *from;
+			++from; ++to;
+		}
+		for (; to_size; --to_size) {
+			*to = 0;
+			++to;
+		}
+
+		program_header = on_offset(program_header,
+				elf_header->e_phentsize);
+	}
+
+	return obj;
+}
