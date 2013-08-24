@@ -13,12 +13,12 @@ all: kernel.elf
 
 kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o syscalls.o gic.o user.o \
 		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o print.o irq.o \
-		growbuf.o pipe_master.o user_pipe_master.o ramdisk.o exec_elf.o
+		growbuf.o pipe_master.o user_pipe_master.o ramdisk.o exec_elf.o tarfs.o
 
 ramdisk.o: ramdisk.tar
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=ramdisk
 
-ramdisk.tar: stupid
+ramdisk.tar: stupid init.txt
 	tar cf $@ $^
 
 stupid: stupid.o uart.o

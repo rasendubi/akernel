@@ -6,6 +6,7 @@
 #include <pipe_master.h>
 #include <print.h>
 #include <scheduler.h>
+#include <tarfs.h>
 #include <user.h>
 
 unsigned hyp_stack[2048];
@@ -26,8 +27,12 @@ int main(void) {
 	init_pipes();
 	init_scheduler();
 
-	unsigned *a = &_binary_ramdisk_tar_start + 0x200/4;
+	void *a = tar_get_file(&_binary_ramdisk_tar_start, "stupid");
 	elf_object *obj = load_elf(a);
+	printa("supid: %p\n", a);
+
+	void *b = tar_get_file(&_binary_ramdisk_tar_start, "init.txt");
+	printa("init.txt: %p\n", b);
 
 	add_task(&init_systems);
 	add_task((void (*)(void))obj->entry_point);

@@ -3,14 +3,7 @@
 #include <alloc.h>
 #include <asm.h>
 #include <pipe.h>
-
-int strcmp(const char *a, const char *b) {
-	while (*a && *a == *b) {
-		++a;
-		++b;
-	}
-	return *a - *b;
-}
+#include <utils.h>
 
 static char *paths[PIPE_LIMIT] = { "/sys/pipe_master" };
 static int n_paths = 1;

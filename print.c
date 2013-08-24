@@ -49,6 +49,8 @@ void printa(const char *format, ...) {
 				print_hex(va_arg(va, unsigned), 1);
 			} else if (format[i] == 'c') {
 				uart_putchar(va_arg(va, unsigned));
+			} else if (format[i] == 'p') {
+				print_hex(va_arg(va, unsigned), 0);
 			}
 		}
 	}

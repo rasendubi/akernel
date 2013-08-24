@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stddef.h>
+
 static inline void *memcpy(void *dest, const void *src, size_t n) {
 	char *d = dest;
 	const char *s = src;
@@ -17,6 +19,14 @@ static inline int strlen(const char *a) {
 		++a;
 	}
 	return i;
+}
+
+static inline int strcmp(const char *a, const char *b) {
+	while (*a && *a == *b) {
+		++a;
+		++b;
+	}
+	return *a - *b;
 }
 
 #endif /* UTILS_H */
