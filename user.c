@@ -1,11 +1,11 @@
 #include <user.h>
 
 #include <alloc.h>
-#include <asm.h>
 #include <print.h>
 #include <uart.h>
 #include <user_pipe_master.h>
 #include <utils.h>
+#include <user/syscalls.h>
 
 static void irq_test(void);
 

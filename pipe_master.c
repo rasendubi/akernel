@@ -1,9 +1,9 @@
 #include <pipe_master.h>
 
 #include <alloc.h>
-#include <asm.h>
 #include <pipe.h>
 #include <utils.h>
+#include <user/syscalls.h>
 
 static char *paths[PIPE_LIMIT] = { "/sys/pipe_master" };
 static int n_paths = 1;

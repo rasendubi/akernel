@@ -1,8 +1,8 @@
 #include <user_pipe_master.h>
 
 #include <alloc.h>
-#include <asm.h>
 #include <utils.h>
+#include <user/syscalls.h>
 
 int pipe_new(const char *name) {
 	int name_len = strlen(name);

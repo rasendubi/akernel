@@ -1,4 +1,3 @@
-#include <asm.h>
 #include <gic.h>
 #include <page_alloc.h>
 #include <pipe.h>
@@ -6,6 +5,7 @@
 #include <print.h>
 #include <scheduler.h>
 #include <user.h>
+#include <user/syscalls.h>
 
 unsigned hyp_stack[2048];
 
