@@ -51,6 +51,11 @@ void user_first(void) {
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
 	if (!fork()) irq_test();
+	if (!fork()) {
+		sys_exec("stupid");
+		printa("stupid returned\n");
+		while (1);
+	}
 	if (!fork()) task();
 	if (!fork()) alloc_test();
 	if (!fork()) print_test();

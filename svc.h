@@ -11,6 +11,7 @@
 #define r2 (STACK_BASE + 2)
 #define r3 (STACK_BASE + 3)
 #define r7 (STACK_BASE + 7)
+#define lr (STACK_BASE + 13)
 
 typedef void svc_handler(task_struct *ts);
 

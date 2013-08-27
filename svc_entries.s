@@ -9,4 +9,5 @@ svc_handlers:
 .word handle_register_isr
 .word handle_page_alloc
 .word handle_page_free
+.word handle_exec
 end_svcs:

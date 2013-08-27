@@ -6,7 +6,7 @@ volatile int glob = 10,
 int main(void) {
 	glob = a + b;
 	uart_puts("Hello from stupid!!!!\n");
-	while (1);
+	return 0;
 }
 
 int first(void) {

@@ -17,3 +17,4 @@ syscall #0x04, read
 syscall #0x05, sys_register_isr
 syscall #0x06, sys_page_alloc
 syscall #0x07, sys_page_free
+syscall #0x08, sys_exec
