@@ -1,6 +1,7 @@
 #include <user_pipe_master.h>
 
 #include <alloc.h>
+#include <pipe_master.h>
 #include <utils.h>
 #include <user/syscalls.h>
 
@@ -13,7 +14,7 @@ int pipe_new(const char *name) {
 	((unsigned *)buf)[1] = 0;
 	((unsigned *)buf)[2] = name_len + 1;
 	memcpy(buf + 3*sizeof(unsigned), name, name_len + 1);
-	write(0, buf, buf_len);
+	write(MASTER_PIPE, buf, buf_len);
 	int reply;
 	read(pid, &reply, sizeof(reply));
 	return reply;
@@ -28,7 +29,7 @@ int pipe_open(const char *name) {
 	((unsigned *)buf)[1] = 1;
 	((unsigned *)buf)[2] = name_len + 1;
 	memcpy(buf + 3*sizeof(unsigned), name, name_len + 1);
-	write(0, buf, buf_len);
+	write(MASTER_PIPE, buf, buf_len);
 	int reply;
 	read(pid, &reply, sizeof(reply));
 	return reply;
