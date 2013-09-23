@@ -81,8 +81,8 @@ void *page_alloc(int level) {
 	return NULL;
 }
 
-void handle_page_alloc(unsigned *stack) {
-	stack[r0] = (unsigned)page_alloc(stack[r0]);
+void handle_page_alloc(task_struct *ts) {
+	ts->stack[r0] = (unsigned)page_alloc(ts->stack[r0]);
 }
 
 /* TODO: Refactor this method */
@@ -106,6 +106,6 @@ void page_free(void *page_start, int level) {
 	}
 }
 
-void handle_page_free(unsigned *stack) {
-	page_free((void*)stack[r0], stack[r1]);
+void handle_page_free(task_struct *ts) {
+	page_free((void*)ts->stack[r0], ts->stack[r1]);
 }
