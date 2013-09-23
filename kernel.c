@@ -1,7 +1,6 @@
 #include <gic.h>
 #include <page_alloc.h>
 #include <pipe.h>
-#include <pipe_master.h>
 #include <print.h>
 #include <scheduler.h>
 #include <user.h>
@@ -10,10 +9,16 @@
 unsigned hyp_stack[2048];
 
 void init_systems(void) {
+	if (!fork()) {
+		do {
+			sys_exec("user/services/pipe_master");
+			printa("pipe_master error\n");
+		} while (1);
+	}
 	if (!fork())
 		user_first();
 
-	pipe_master();
+	while (1);
 }
 
 int main(void) {

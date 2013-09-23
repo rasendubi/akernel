@@ -1,2 +1,0 @@
-Hello initial ramdisk!
-Hi on next line!

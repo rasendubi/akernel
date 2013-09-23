@@ -2,6 +2,7 @@
 
 #include <alloc.h>
 #include <pipe.h>
+#include <uart.h>
 #include <utils.h>
 #include <user/syscalls.h>
 
@@ -18,7 +19,8 @@ static int open_pipe(const char *name) {
 
 }
 
-void pipe_master(void) {
+int _start(void) {
+	uart_puts("Pipe master started\n");
 	while (1) {
 		unsigned reply_pipe;
 		unsigned plen;
@@ -38,4 +40,5 @@ void pipe_master(void) {
 			free(name);
 		}
 	}
+	return -1;
 }

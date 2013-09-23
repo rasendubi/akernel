@@ -13,23 +13,25 @@ all: kernel.elf
 
 kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o gic.o user.o \
 		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o print.o irq.o \
-		growbuf.o pipe_master.o user_pipe_master.o ramdisk.o exec_elf.o tarfs.o \
+		growbuf.o user_pipe_master.o ramdisk.o exec_elf.o tarfs.o \
 		exec.o user/syscalls.o
 	$(CC) $(LDFLAGS) -o $@ $^ -lgcc -lc -Tkernel.ld
 
 ramdisk.o: ramdisk.tar
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=ramdisk
 
-ramdisk.tar: stupid init.txt
+ramdisk.tar: stupid user/services/pipe_master
 	tar cf $@ $^
 
 stupid: stupid.o uart.o
+
+user/services/pipe_master: user/services/pipe_master.o user/syscalls.o user/page_alloc.o alloc.o uart.o
 
 run: kernel.elf
 	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf
 
 clean:
-	rm -f *.o *.elf *.tar stupid user/syscalls.o
+	rm -f *.o *.elf *.tar stupid user/*.o user/services/*.o user/services/pipe_master
 
 %.o: %.s
 	$(CC) $(CFLAGS) -o $@ -c $^
