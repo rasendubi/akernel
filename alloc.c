@@ -2,6 +2,8 @@
 
 #include <page_alloc.h>
 
+#define ALIGN 4
+
 #ifdef DEBUG_ALLOC
 	#include <print.h>
 	#define debug(...) printa(__VA_ARGS__)
@@ -88,6 +90,7 @@ void *malloc(size_t size) {
 	}
 	size = max(size + sizeof(occupied_struct),
 			sizeof(free_struct));
+	size = ((size - 1)/ALIGN + 1)*ALIGN;
 	free_struct *prev = get_free_for(size);
 	if (!prev->next) {
 		return NULL;
