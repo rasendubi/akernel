@@ -28,6 +28,12 @@ void alloc_test(void) {
 	char *b4 = malloc(100000);
 	char *b5 = malloc(1000000);
 	printa("Allocated\n");
+	b1 = realloc(b1, 4);
+	b2 = realloc(b2, 0);
+	b3 = realloc(b3, 1000);
+	b4 = realloc(b4, 100000);
+	b5 = realloc(b5, 500000);
+	printa("Reallocated\n");
 	free(b4);
 	free(b2);
 	free(b3);

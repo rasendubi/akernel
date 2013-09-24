@@ -5,5 +5,6 @@
 
 void *malloc(size_t size);
 void free(void *addr);
+void *realloc(void *old, size_t size);
 
 #endif /* ALLOC_H */
