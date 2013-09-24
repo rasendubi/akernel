@@ -214,3 +214,10 @@ void *realloc(void *old, size_t size_in) {
 		return (void *)((unsigned)os + sizeof(*os));
 	}
 }
+
+void *calloc(size_t num, size_t elem_size) {
+	size_t size = num*elem_size;
+	void *mem = malloc(size);
+	memset(mem, 0, size);
+	return mem;
+}

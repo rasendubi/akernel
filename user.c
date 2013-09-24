@@ -34,11 +34,14 @@ void alloc_test(void) {
 	b4 = realloc(b4, 100000);
 	b5 = realloc(b5, 500000);
 	printa("Reallocated\n");
+	char *b6 = calloc(100, 4);
+	printa("Calloced\n");
 	free(b4);
 	free(b2);
 	free(b3);
 	free(b1);
 	free(b5);
+	free(b6);
 	printa("Freed\n");
 	while (1);
 }

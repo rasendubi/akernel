@@ -12,6 +12,13 @@ static inline void *memcpy(void *dest, const void *src, size_t n) {
 	return dest;
 }
 
+static inline void memset(void *ptr, int value, size_t num) {
+	char *arr = (char *)ptr;
+	for (size_t i = 0; i < num; ++i) {
+		arr[i] = value;
+	}
+}
+
 static inline int strlen(const char *a) {
 	size_t i = 0;
 	while (*a) {
