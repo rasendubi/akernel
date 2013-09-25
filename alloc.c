@@ -121,7 +121,7 @@ void *malloc(size_t size) {
 	occupied_struct *occ = get_from_next_region(prev, size);
 
 	debug("%x-%x\n", (unsigned)occ, (unsigned)occ + size);
-	return (void *)((unsigned)occ + sizeof(*occ));
+	return (void *)(occ + 1);
 }
 
 void free(void *addr) {
@@ -131,8 +131,7 @@ void free(void *addr) {
 		return;
 	}
 
-	occupied_struct *occ = (occupied_struct*)((unsigned)addr -
-			sizeof(struct occupied_struct));
+	occupied_struct *occ = (occupied_struct*)addr - 1;
 	size_t size = occ->size;
 	free_struct *free_region = (free_struct *)occ;
 	free_region->size = size;
@@ -177,9 +176,7 @@ static occupied_struct *extend_realloc(occupied_struct *occ,
 
 
 	occupied_struct *os = get_from_next_region(best_pre, size);
-	memcpy((void *)((unsigned)os + sizeof(*os)),
-			(void *)((unsigned)occ + sizeof(*occ)),
-			occ->size);
+	memcpy((void *)(os + 1), (void *)(occ + 1), occ->size);
 	os->size = size;
 	return os;
 }
@@ -196,8 +193,7 @@ void *realloc(void *old, size_t size_in) {
 	size_t size = size_in + sizeof(occupied_struct);
 	size = ((size - 1)/ALIGN + 1)*ALIGN;
 
-	occupied_struct *occ = (occupied_struct *)((size_t)old -
-			sizeof(occupied_struct));
+	occupied_struct *occ = (occupied_struct *)old - 1;
 	if (size <= occ->size) {
 		/* Shrink */
 		size_t new_free_size = occ->size - size;
@@ -211,7 +207,7 @@ void *realloc(void *old, size_t size_in) {
 		return old;
 	} else {
 		occupied_struct *os = extend_realloc(occ, size);
-		return (void *)((unsigned)os + sizeof(*os));
+		return (void *)(os + 1);
 	}
 }
 
