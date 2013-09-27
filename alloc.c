@@ -44,7 +44,7 @@ static inline int get_2_power(size_t size) {
 static free_struct *add_free_region(free_struct *region) {
 	free_struct *cur = &first_free;
 	free_struct *prev = 0;
-	while (cur->next && cur->next > region) {
+	while (cur->next && cur->next < region) {
 		prev = cur;
 		cur = cur->next;
 	}
@@ -178,6 +178,9 @@ static occupied_struct *extend_realloc(occupied_struct *occ,
 	occupied_struct *os = get_from_next_region(best_pre, size);
 	memcpy((void *)(os + 1), (void *)(occ + 1), occ->size);
 	os->size = size;
+
+	add_free_region((free_struct *)occ);
+
 	return os;
 }
 
@@ -198,17 +201,17 @@ void *realloc(void *old, size_t size_in) {
 		/* Shrink */
 		size_t new_free_size = occ->size - size;
 		if (new_free_size > sizeof(free_struct)) {
-			occ->size -= new_free_size;
 			free_struct *fs = (free_struct *)((unsigned)occ +
-					(size - new_free_size));
+					(occ->size - new_free_size));
 			fs->size = new_free_size;
+			occ->size -= new_free_size;
 			add_free_region(fs);
 		}
 		return old;
-	} else {
-		occupied_struct *os = extend_realloc(occ, size);
-		return (void *)(os + 1);
 	}
+
+	occupied_struct *os = extend_realloc(occ, size);
+	return (void *)(os + 1);
 }
 
 void *calloc(size_t num, size_t elem_size) {
@@ -216,4 +219,11 @@ void *calloc(size_t num, size_t elem_size) {
 	void *mem = malloc(size);
 	memset(mem, 0, size);
 	return mem;
+}
+
+void mem_dump(void) {
+	for (free_struct *fs = first_free.next; fs; fs = fs->next) {
+		printa("Free zone at: 0x%x-0x%x, size: 0x%x\n",
+				fs, (unsigned)fs + fs->size, fs->size);
+	}
 }

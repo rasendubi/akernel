@@ -8,4 +8,6 @@ void free(void *addr);
 void *realloc(void *old, size_t size);
 void *calloc(size_t num, size_t size);
 
+void mem_dump(void);
+
 #endif /* ALLOC_H */
