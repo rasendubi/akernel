@@ -15,7 +15,7 @@ all: kernel.elf
 kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o gic.o user.o \
 		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o print.o irq.o \
 		growbuf.o user_pipe_master.o ramdisk.o exec_elf.o tarfs.o \
-		exec.o user/syscalls.o
+		exec.o user/syscalls.o slab.o slab_alloc.o
 	$(CC) $(LDFLAGS) -o $@ $^ -lgcc -lc -Tkernel.ld
 
 ramdisk.o: ramdisk.tar
