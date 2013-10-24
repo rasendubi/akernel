@@ -1,14 +1,16 @@
-CC=arm-unknown-linux-gnueabi-gcc
-OBJCOPY=arm-unknown-linux-gnueabi-objcopy
+CROSS_PREFIX?=arm-unknown-linux-gnueabi-
 
-CFLAGS=-ansi -pedantic -Wall -Wextra -march=armv7-a -msoft-float -fPIE -mapcs-frame -I. -ffreestanding \
+CC:=$(CROSS_PREFIX)gcc
+OBJCOPY:=$(CROSS_PREFIX)objcopy
+
+CFLAGS:=-ansi -pedantic -Wall -Wextra -march=armv7-a -msoft-float -fPIE -mapcs-frame -I. -ffreestanding \
        -std=c99
-LDFLAGS=-nostdlib -N
-LIBS=-lgcc -lc
+LDFLAGS:=-nostdlib -N
+LIBS:=-lgcc -lc
 
-QEMU=qemu-system-arm
-BOARD=realview-pb-a8
-CPU=cortex-a8
+QEMU:=qemu-system-arm
+BOARD:=realview-pb-a8
+CPU:=cortex-a8
 
 all: kernel.elf
 
