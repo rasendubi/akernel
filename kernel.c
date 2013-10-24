@@ -6,8 +6,10 @@
 #include <user.h>
 #include <user/syscalls.h>
 
+/* Define hypervisor stack */
 unsigned hyp_stack[2048];
 
+/* Initialize all services and execute user level code */
 void init_systems(void) {
 	if (!fork()) {
 		do {
@@ -21,6 +23,7 @@ void init_systems(void) {
 	while (1);
 }
 
+/* Initialize all kernel subsystems and run system */
 int main(void) {
 	printa("In main %x\n", (unsigned)main);
 	init_int();

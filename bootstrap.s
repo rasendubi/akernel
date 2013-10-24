@@ -1,3 +1,8 @@
+/* The sole purpose of this file is to initialize processor and get ready to execute C program.
+ *
+ * _start is a kernel entry point. It copies interrupt table to the right place, initializes hypervisor and
+ * irq stacks and transfers control to main() function.
+ */
 .global _start
 _start:
 	mov r0, #0x00
@@ -19,11 +24,11 @@ keep_loading:
 	bl main
 
 interrupt_table:
-/* 0 */	nop
+	nop /* 0 */
 	nop
 	ldr pc, svc_entry_address
 	nop
-/* 5 */ nop
+	nop /* 5 */
 	nop
 	ldr pc, irq_entry_address
 
