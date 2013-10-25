@@ -6,7 +6,7 @@ OBJCOPY:=$(CROSS_PREFIX)objcopy
 CFLAGS:=-ansi -pedantic -Wall -Wextra -march=armv7-a -msoft-float -fPIE -mapcs-frame -I. -ffreestanding \
        -std=c99
 LDFLAGS:=-nostdlib -N
-LIBS:=-lgcc -lc
+LIBS:=-lgcc 
 
 QEMU:=qemu-system-arm
 BOARD:=realview-pb-a8
@@ -18,7 +18,7 @@ kernel.elf: kernel.ld bootstrap.o kernel.o uart.o context_switch.o gic.o user.o 
 		scheduler.o pipe.o page_alloc.o svc.o svc_entries.o alloc.o print.o irq.o \
 		growbuf.o user_pipe_master.o ramdisk.o exec_elf.o tarfs.o \
 		exec.o user/syscalls.o slab.o slab_alloc.o
-	$(CC) $(LDFLAGS) -o $@ $^ -lgcc -lc -Tkernel.ld
+	$(CC) $(LDFLAGS) -o $@ $^ -lgcc -Tkernel.ld
 
 ramdisk.o: ramdisk.tar
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=ramdisk
