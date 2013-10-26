@@ -3,6 +3,7 @@
 #include <slab.h>
 #include <page_alloc.h>
 #include <utils.h>
+#include <print.h>
 
 #define MAX_POWER 10
 #define MAX_SIZE (1 << MAX_POWER)

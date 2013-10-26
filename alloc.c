@@ -3,10 +3,11 @@
 #include <page_alloc.h>
 #include <utils.h>
 
+#include <print.h>
+
 #define ALIGN 4
 
 #ifdef DEBUG_ALLOC
-	#include <print.h>
 	#define debug(...) printa(__VA_ARGS__)
 #else
 	#define debug(...) do {} while(0)

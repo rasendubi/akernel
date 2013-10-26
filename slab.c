@@ -2,6 +2,9 @@
 
 #include <page_alloc.h>
 
+#include <print.h>
+#include <uart.h>
+
 /**
  * Slab object. All slabs are located in one-way linked lists.
  */
