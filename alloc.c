@@ -222,8 +222,10 @@ void *calloc(size_t num, size_t elem_size) {
 }
 
 void mem_dump(void) {
+#ifdef DEBUG_ALLOC
 	for (free_struct *fs = first_free.next; fs; fs = fs->next) {
-		printa("Free zone at: 0x%x-0x%x, size: 0x%x\n",
+		debug("Free zone at: 0x%x-0x%x, size: 0x%x\n",
 				fs, (unsigned)fs + fs->size, fs->size);
 	}
+#endif
 }

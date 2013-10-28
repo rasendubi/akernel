@@ -7,6 +7,13 @@
 #define MAX_POWER 10
 #define MAX_SIZE (1 << MAX_POWER)
 
+#ifdef DEBUG_ALLOC
+	#include <print.h>
+	#define debug(...) printa(__VA_ARGS__)
+#else
+	#define debug(...) do {} while(0)
+#endif
+
 static int initialized = 0;
 static slab_cache caches[MAX_POWER];
 
@@ -56,7 +63,6 @@ void *slab_alloc(size_t size) {
     }
 
     int power_of_2 = get_2_power(size-1);
-    printa("Allocate %x in %x\n", size, power_of_2);
     return slab_cache_alloc(&caches[power_of_2]);
 }
 
@@ -130,12 +136,12 @@ void *slab_realloc(void *addr, size_t size) {
 void slab_mem_dump(void) {
     big_object *bo = first_big.next;
     while (bo) {
-        printa("Big object at: %x (%x)\n", bo->start, bo->page_power);
+        debug("Big object at: %x (%x)\n", bo->start, bo->page_power);
         bo = bo->next;
     }
 
     for (int i = 0; i < MAX_POWER; ++i) {
-        printa("Slab %x\n", i);
+        debug("Slab %x\n", i);
         slab_cache_mem_dump(&caches[i]);
     }
 }

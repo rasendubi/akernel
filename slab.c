@@ -1,5 +1,8 @@
 #include <slab.h>
 
+#include <print.h>
+#include <uart.h>
+
 #include <page_alloc.h>
 
 /**
