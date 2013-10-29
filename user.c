@@ -20,16 +20,6 @@ static void task(void) {
 	while (1);
 }
 
-void print_test(void) {
-	printa("Plain: Hello, world!\n");
-	printa("String: Hello %s, %s!\n", "one", "two");
-	printa("Hex down: %x %x %x\n", 0x0, 0xdeadbeaf, 0xf000f000);
-	printa("Hex up: %X %X %X\n", 0x0, 0xdeadbeaf, 0xf000f000);
-	printa("Escaping: %% %s %%\n", "done");
-	printa("Chars: %c%c%c%c\n", 'c', 'o', 'o', 'l');
-	while (1);
-}
-
 void user_first(void) {
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
@@ -41,7 +31,7 @@ void user_first(void) {
 	}
 	if (!fork()) sys_exec("user/alloc_test");
 	if (!fork()) task();
-	if (!fork()) print_test();
+	if (!fork()) sys_exec("user/print_test");
 	printa("In user mode again\n");
 	while (1) {
 		int len;
