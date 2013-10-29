@@ -1,5 +1,3 @@
-#include <user.h>
-
 #include <alloc.h>
 #include <print.h>
 #include <uart.h>
@@ -18,7 +16,7 @@ static void task(void) {
 	while (1);
 }
 
-void user_first(void) {
+void _start(void) {
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
 	if (!fork()) sys_exec("user/irq_test");

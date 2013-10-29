@@ -3,7 +3,6 @@
 #include <pipe.h>
 #include <print.h>
 #include <scheduler.h>
-#include <user.h>
 #include <user/syscalls.h>
 
 /* Define hypervisor stack */
@@ -18,7 +17,7 @@ void init_systems(void) {
 		} while (1);
 	}
 	if (!fork())
-		user_first();
+		sys_exec("user/user_first");
 
 	while (1);
 }
