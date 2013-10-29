@@ -27,7 +27,8 @@ ramdisk.tar: \
 		stupid \
 		user/services/pipe_master \
 		user/alloc_test \
-		user/print_test
+		user/print_test \
+		user/irq_test
 	tar cf $@ $^
 
 stupid: stupid.o uart.o
@@ -38,6 +39,8 @@ user/alloc_test: user/alloc_test.o alloc.o print.o uart.o user/page_alloc.o user
 
 user/print_test: user/print_test.o user/syscalls.o print.o uart.o
 
+user/irq_test: user/irq_test.o user/syscalls.o print.o uart.o
+
 run: kernel.elf
 	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf
 
@@ -47,6 +50,7 @@ clean:
 		user/*.o \
 		user/alloc_test \
 		user/print_test \
+		user/irq_test \
 		user/services/*.o \
 		user/services/pipe_master \
 

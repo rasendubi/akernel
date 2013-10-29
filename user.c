@@ -7,8 +7,6 @@
 #include <utils.h>
 #include <user/syscalls.h>
 
-static void irq_test(void);
-
 static void task(void) {
 	const char *message = "Hello from task\n";
 	int pipe = pipe_open("/task1");
@@ -23,7 +21,7 @@ static void task(void) {
 void user_first(void) {
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
-	if (!fork()) irq_test();
+	if (!fork()) sys_exec("user/irq_test");
 	if (!fork()) {
 		sys_exec("stupid");
 		printa("stupid returned\n");
@@ -41,19 +39,4 @@ void user_first(void) {
 		printa("Message read: %s", buf);
 		free(buf);
 	}
-}
-
-static int ticks;
-static int user_isr(unsigned line) {
-	(void)line;
-	if (++ticks%8 == 0) {
-		printa("%x ticks\n", ticks);
-	}
-	return 0;
-}
-
-static void irq_test(void) {
-	ticks = 0;
-	sys_register_isr(36, &user_isr);
-	while (1);
 }
