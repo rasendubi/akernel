@@ -24,7 +24,7 @@ ramdisk.o: ramdisk.tar
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm $^ $@ --rename-section .data=ramdisk
 
 ramdisk.tar: \
-		stupid \
+		user/stupid \
 		user/services/pipe_master \
 		user/alloc_test \
 		user/print_test \
@@ -32,7 +32,7 @@ ramdisk.tar: \
 		user/user_first
 	tar cf $@ $^
 
-stupid: stupid.o uart.o
+user/stupid: user/stupid.o uart.o
 
 user/services/pipe_master: user/services/pipe_master.o user/syscalls.o user/page_alloc.o alloc.o print.o uart.o
 
@@ -49,8 +49,8 @@ run: kernel.elf
 
 clean:
 	rm -f *.o *.elf *.tar \
-		stupid \
 		user/*.o \
+		user/stupid \
 		user/alloc_test \
 		user/print_test \
 		user/irq_test \

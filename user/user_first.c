@@ -21,7 +21,7 @@ void _start(void) {
 	printa("In user mode\n");
 	if (!fork()) sys_exec("user/irq_test");
 	if (!fork()) {
-		sys_exec("stupid");
+		sys_exec("user/stupid");
 		printa("stupid returned\n");
 		while (1);
 	}
