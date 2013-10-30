@@ -13,14 +13,18 @@ void init_scheduler(void);
 void add_task(void (*start)(void));
 void schedule();
 
+struct task_struct;
+
 typedef struct task_struct {
-	unsigned *stack;
-	unsigned state;
+	unsigned *stack, *stack_beginning;
+	unsigned state, pid;
+	struct task_struct *next;
+	struct task_struct *prev;
 } task_struct;
 
 extern task_struct tasks[];
 
-extern size_t cur_task;
-extern size_t task_count;
+extern task_struct *cur_task;
+extern task_struct *first_task;
 
 #endif /* SCHEDULER_H */
