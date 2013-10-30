@@ -6,17 +6,18 @@
 #include <utils.h>
 #include <user/syscalls.h>
 
+#define CUSTOM_PIPE_BASE 256
+
 static char *paths[PIPE_LIMIT] = { "/sys/pipe_master" };
 static int n_paths = 1;
 
 static int open_pipe(const char *name) {
 	for (int i = 0; i < n_paths; ++i) {
 		if (strcmp(name, paths[i]) == 0) {
-			return i + TASK_LIMIT;
+			return i ? i + CUSTOM_PIPE_BASE : 0;
 		}
 	}
 	return -1;
-
 }
 
 int _start(void) {
@@ -31,8 +32,8 @@ int _start(void) {
 		char *name = malloc(plen);
 		read(MASTER_PIPE, name, plen);
 		if (op == 0) {
-			paths[n_paths++] = name;
-			int i = n_paths + TASK_LIMIT - 1;
+			paths[n_paths] = name;
+			int i = CUSTOM_PIPE_BASE + n_paths++;
 			write(reply_pipe, &i, sizeof(i));
 		} else {
 			int i = open_pipe(name);

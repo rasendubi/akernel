@@ -3,7 +3,7 @@
 
 #include <scheduler.h>
 
-#define PIPE_LIMIT (TASK_LIMIT*5)
+#define PIPE_LIMIT (1024)
 
 void init_pipes(void);
 

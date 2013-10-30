@@ -47,12 +47,14 @@ void handle_write(task_struct *ts) {
 	for (size_t i = 0; i < task[r2]; ++i) {
 		grow_push(pipe, buf[i]);
 	}
-	task_struct *task_s = first_task;
-	if (task_s != 0)
+
+	task_struct *cur_task = first_task;
+	if (cur_task) {
 		do {
-			if (task_s->state == TASK_WAIT_READ) {
-				handle_read(task_s);
+			if (cur_task->state == TASK_WAIT_READ) {
+				handle_read(cur_task);
 			}
-			task_s = task_s->next;
-		} while (task_s != first_task);
+			cur_task = cur_task->next;
+		} while (cur_task != first_task);
+	}
 }
