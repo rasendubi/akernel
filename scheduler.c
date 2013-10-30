@@ -9,14 +9,16 @@
 #include <svc.h>
 #include <timer.h>
 #include <utils.h>
+#include <alloc.h>
 
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
 
-static unsigned int *stacks[TASK_LIMIT];
 task_struct tasks[TASK_LIMIT];
 
-size_t cur_task = -1;
-size_t task_count = 0;
+task_struct *cur_task = 0;
+task_struct *first_task = 0;
+
+unsigned next_pid = 0;
 
 static task_struct init_task(unsigned int *stack, void (*start)(void)) {
 	task_struct ts;
@@ -29,9 +31,20 @@ static task_struct init_task(unsigned int *stack, void (*start)(void)) {
 }
 
 void add_task(void (*start)(void)) {
-	stacks[task_count] = page_alloc(0);
-	tasks[task_count] = init_task(stacks[task_count], start);
-	++task_count;
+	task_struct *new_task = malloc(sizeof(task_struct));
+	unsigned *stack_beginning = page_alloc(0);
+	*new_task = init_task(stack_beginning, start);
+	new_task->stack_beginning = stack_beginning;
+	new_task->pid = next_pid++;
+	if (first_task == 0) {
+		first_task = new_task;
+		new_task->prev = new_task;
+		new_task->next = new_task;
+	}
+	else {
+		first_task->prev->next = new_task;
+		first_task->prev = new_task;
+	}
 }
 
 #define NEED_RESCHED 1
@@ -61,10 +74,12 @@ void init_scheduler(void) {
 void schedule(void) {
 	flags &= ~NEED_RESCHED;
 	do {
-		cur_task = (cur_task + 1)%task_count;
-	} while (tasks[cur_task].state != TASK_READY);
-
-	tasks[cur_task].stack = activate(tasks[cur_task].stack);
+		if (cur_task != 0)
+			cur_task = cur_task->next;
+		else
+			cur_task = first_task;
+	} while (cur_task->state != TASK_READY);
+	cur_task->stack = activate(cur_task->stack);
 }
 
 void handle_yield(task_struct *ts) {
@@ -75,22 +90,27 @@ void handle_yield(task_struct *ts) {
 
 void handle_fork(task_struct *ts) {
 	unsigned *stack = ts->stack;
-	if (task_count == TASK_LIMIT) {
+	if (next_pid == TASK_LIMIT) { //TODO: Fix it
 		stack[r0] = -1;
 	} else {
-		size_t used = stacks[cur_task] + STACK_SIZE - stack;
-		stacks[task_count] = page_alloc(0);
-		tasks[task_count].stack = stacks[task_count] + STACK_SIZE - used;
-		memcpy(tasks[task_count].stack, stack,
-				used*sizeof(*stack));
-		stack[r0] = task_count;
-		tasks[task_count].stack[r0] = 0;
-		tasks[task_count].state = ts->state;
-		++task_count;
+		size_t used = cur_task->stack_beginning + STACK_SIZE - stack;
+		task_struct *new_task = malloc(sizeof(task_struct));
+		new_task->stack_beginning = page_alloc(0);
+		new_task->stack = new_task->stack_beginning + STACK_SIZE - used;
+		memcpy(new_task->stack, stack, used*sizeof(*stack));
+		new_task->pid = next_pid++;
+		stack[r0] = new_task->pid;
+		new_task->stack[r0] = 0;
+		new_task->state = ts->state;
+
+		new_task->prev = first_task->prev;
+		new_task->next = first_task;
+		first_task->prev->next = new_task;
+		first_task->prev = new_task;
 	}
 }
 
 void handle_getpid(task_struct *ts) {
 	unsigned *stack = ts->stack;
-	stack[r0] = cur_task;
+	stack[r0] = cur_task->pid;
 }

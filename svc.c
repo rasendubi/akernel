@@ -9,7 +9,7 @@ extern svc_handler *svc_handlers[];
 extern svc_handler *end_svcs;
 
 void handle_svc(int svc, unsigned *stack) {
-	tasks[cur_task].stack = stack;
+	cur_task->stack = stack;
 
 	if (svc >= &end_svcs - svc_handlers) {
 		printa("Error: unknown SVC: %x\n", svc);
@@ -21,5 +21,5 @@ void handle_svc(int svc, unsigned *stack) {
 		return;
 	}
 
-	svc_handlers[svc](&tasks[cur_task]);
+	svc_handlers[svc](cur_task);
 }

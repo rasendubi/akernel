@@ -47,10 +47,12 @@ void handle_write(task_struct *ts) {
 	for (size_t i = 0; i < task[r2]; ++i) {
 		grow_push(pipe, buf[i]);
 	}
-
-	for (size_t i = 0; i < task_count; ++i) {
-		if (tasks[i].state == TASK_WAIT_READ) {
-			handle_read(&tasks[i]);
-		}
-	}
+	task_struct *task_s = first_task;
+	if (task_s != 0)
+		do {
+			if (task_s->state == TASK_WAIT_READ) {
+				handle_read(task_s);
+			}
+			task_s = task_s->next;
+		} while (task_s != first_task);
 }
