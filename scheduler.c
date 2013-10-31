@@ -106,3 +106,14 @@ void handle_getpid(task_struct *ts) {
 	unsigned *stack = ts->stack;
 	stack[r0] = cur_task->pid;
 }
+
+void handle_exit(task_struct *ts) {
+	ts->prev->next = ts->next;
+	ts->next->prev = ts->prev;
+	if (ts->next == ts) first_task = 0; // There are no other tasks
+	flags |= NEED_RESCHED;
+
+	page_free(ts->stack_start, 0);
+	free(ts);
+	// TODO: Free all resources used by ts
+}

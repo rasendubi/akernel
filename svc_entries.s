@@ -10,4 +10,5 @@ svc_handlers:
 .word handle_page_alloc
 .word handle_page_free
 .word handle_exec
+.word handle_exit
 end_svcs:

@@ -13,7 +13,8 @@ static void task(void) {
 	memcpy(buf + sizeof(unsigned), message, strlen(message) + 1);
 	write(pipe, buf, sizeof(unsigned) + strlen(message) + 1);
 	printa("In other task\n");
-	while (1);
+	exit(0);
+	printa("Exited failed\n");
 }
 
 void _start(void) {
