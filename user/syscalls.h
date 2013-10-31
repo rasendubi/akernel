@@ -12,5 +12,6 @@ int sys_register_isr(unsigned line, int (*handler)(unsigned line));
 void *sys_page_alloc(unsigned order);
 void sys_page_free(void *addr, unsigned order);
 int sys_exec(const char *path);
+void exit(int status);
 
 #endif /* SYSCALLS_H */
