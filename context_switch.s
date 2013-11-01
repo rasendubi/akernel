@@ -1,6 +1,24 @@
 GIC0: .word 0x1E000000
 TASK_READY: .word 0
 
+.type activate_kernel, %function
+.global activate_kernel
+activate_kernel:
+	push {r4-r10, fp, ip, lr}
+	mrs r4, CPSR
+	mov r5, #activate_kernel_restore
+	push {r4, r5}
+	str sp, [r0, #0x0]
+
+	ldr sp, [r1, #0x0]
+	pop {r4, r5}
+	msr SPSR, r4
+	movs pc, r5
+
+activate_kernel_restore:
+	pop {r4-r10, fp, ip, lr}
+	bx lr
+
 .type activate, %function
 .global activate
 activate:
