@@ -12,6 +12,7 @@
 #include <alloc.h>
 
 #define STACK_SIZE (PAGE_SIZE/sizeof(unsigned))
+#define KERNEL_STACK_POWER 1
 
 task_struct *cur_task = 0;
 task_struct *first_task = 0;
@@ -29,7 +30,9 @@ static task_struct init_task(unsigned int *stack, void (*entry_point)(void)) {
 }
 
 void add_task(void (*entry_point)(void)) {
-	task_struct *new_task = malloc(sizeof(task_struct));
+	void *kernel_stack = page_alloc(KERNEL_STACK_POWER);
+	task_struct *new_task = (task_struct *)kernel_stack;
+
 	unsigned *stack_start = page_alloc(0);
 	*new_task = init_task(stack_start, entry_point);
 	new_task->stack_start = stack_start;
@@ -116,5 +119,5 @@ void handle_exit(task_struct *ts) {
 	flags |= NEED_RESCHED;
 
 	page_free(ts->stack_start, 0);
-	free(ts);
+	page_free(ts, KERNEL_STACK_POWER);
 }
