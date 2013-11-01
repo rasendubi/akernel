@@ -10,13 +10,13 @@ unsigned hyp_stack[2048];
 
 /* Initialize all services and execute user level code */
 void init_systems(void) {
-	if (!fork()) {
+	if (!sys_fork()) {
 		do {
 			sys_exec("user/services/pipe_master");
 			printa("pipe_master error\n");
 		} while (1);
 	}
-	if (!fork())
+	if (!sys_fork())
 		sys_exec("user/user_first");
 
 	while (1);

@@ -26,18 +26,18 @@ int _start(void) {
 		unsigned reply_pipe;
 		unsigned plen;
 		unsigned op;
-		read(MASTER_PIPE, &reply_pipe, sizeof(reply_pipe));
-		read(MASTER_PIPE, &op, sizeof(op));
-		read(MASTER_PIPE, &plen, sizeof(plen));
+		sys_read(MASTER_PIPE, &reply_pipe, sizeof(reply_pipe));
+		sys_read(MASTER_PIPE, &op, sizeof(op));
+		sys_read(MASTER_PIPE, &plen, sizeof(plen));
 		char *name = malloc(plen);
-		read(MASTER_PIPE, name, plen);
+		sys_read(MASTER_PIPE, name, plen);
 		if (op == 0) {
 			paths[n_paths] = name;
 			int i = CUSTOM_PIPE_BASE + n_paths++;
-			write(reply_pipe, &i, sizeof(i));
+			sys_write(reply_pipe, &i, sizeof(i));
 		} else {
 			int i = open_pipe(name);
-			write(reply_pipe, &i, sizeof(i));
+			sys_write(reply_pipe, &i, sizeof(i));
 			free(name);
 		}
 	}

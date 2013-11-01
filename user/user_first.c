@@ -11,30 +11,30 @@ static void task(void) {
 	char *buf = malloc(sizeof(unsigned) + strlen(message) + 1);
 	((unsigned*)buf)[0] = strlen(message) + 1;
 	memcpy(buf + sizeof(unsigned), message, strlen(message) + 1);
-	write(pipe, buf, sizeof(unsigned) + strlen(message) + 1);
+	sys_write(pipe, buf, sizeof(unsigned) + strlen(message) + 1);
 	printa("In other task\n");
-	exit(0);
-	printa("Exited failed\n");
+	sys_exit(0);
+	printa("Exit failed\n");
 }
 
 void _start(void) {
 	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
-	if (!fork()) sys_exec("user/irq_test");
-	if (!fork()) {
+	if (!sys_fork()) sys_exec("user/irq_test");
+	if (!sys_fork()) {
 		sys_exec("user/stupid");
 		printa("stupid returned\n");
 		while (1);
 	}
-	if (!fork()) sys_exec("user/alloc_test");
-	if (!fork()) task();
-	if (!fork()) sys_exec("user/print_test");
+	if (!sys_fork()) sys_exec("user/alloc_test");
+	if (!sys_fork()) task();
+	if (!sys_fork()) sys_exec("user/print_test");
 	printa("In user mode again\n");
 	while (1) {
 		int len;
-		read(pipe, &len, sizeof(len));
+		sys_read(pipe, &len, sizeof(len));
 		char *buf = malloc(len);
-		read(pipe, buf, len);
+		sys_read(pipe, buf, len);
 		printa("Message read: %s", buf);
 		free(buf);
 	}
