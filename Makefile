@@ -4,7 +4,7 @@ CC := $(CROSS_PREFIX)gcc
 OBJCOPY := $(CROSS_PREFIX)objcopy
 
 CFLAGS := -ansi -pedantic -Wall -Wextra -march=armv7-a -msoft-float -fPIE -mapcs-frame -I. -ffreestanding \
-       -std=c99
+		-std=c99 -g
 LDFLAGS := -nostdlib -N
 LIBS := -lgcc
 
@@ -32,7 +32,7 @@ ramdisk.tar: \
 		user/user_first
 	tar cf $@ $^
 
-user/stupid: user/stupid.o uart.o
+user/stupid: user/stupid.o uart.o user/syscalls.o
 
 user/services/pipe_master: user/services/pipe_master.o user/syscalls.o user/page_alloc.o alloc.o print.o uart.o
 
@@ -46,6 +46,10 @@ user/user_first: user/user_first.o user/syscalls.o print.o uart.o alloc.o user/p
 
 run: kernel.elf
 	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf
+
+debug: kernel.elf
+	$(QEMU) -M $(BOARD) -cpu $(CPU) -nographic -kernel kernel.elf -gdb tcp::1234 -S
+
 
 clean:
 	rm -f *.o *.elf *.tar \

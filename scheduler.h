@@ -9,9 +9,12 @@
 void init_scheduler(void);
 
 void add_task(void (*entry_point)(void));
-void schedule();
+void schedule(void);
 
 typedef struct task_struct {
+	unsigned *kernel_stack;
+	unsigned *kernel_stack_start;
+
 	unsigned *stack;
 	unsigned *stack_start;
 	unsigned state;

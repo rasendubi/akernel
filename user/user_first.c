@@ -18,18 +18,16 @@ static void task(void) {
 }
 
 void _start(void) {
-	int pipe = pipe_new("/task1");
 	printa("In user mode\n");
+	// int pipe = pipe_new("/task1");
 	if (!sys_fork()) sys_exec("user/irq_test");
-	if (!sys_fork()) {
-		sys_exec("user/stupid");
-		printa("stupid returned\n");
-		while (1);
-	}
+	if (!sys_fork()) sys_exec("user/stupid");
 	if (!sys_fork()) sys_exec("user/alloc_test");
-	if (!sys_fork()) task();
+	// if (!sys_fork()) task();
 	if (!sys_fork()) sys_exec("user/print_test");
 	printa("In user mode again\n");
+
+	/*
 	while (1) {
 		int len;
 		sys_read(pipe, &len, sizeof(len));
@@ -38,4 +36,6 @@ void _start(void) {
 		printa("Message read: %s", buf);
 		free(buf);
 	}
+	*/
+	while (1);
 }

@@ -1,4 +1,5 @@
 #include <uart.h>
+#include <user/syscalls.h>
 
 volatile int glob = 10,
 	 a = 5, b = 4;
@@ -6,7 +7,7 @@ volatile int glob = 10,
 int _start(void) {
 	glob = a + b;
 	uart_puts("Hello from stupid!!!!\n");
-	return 0;
+	sys_exit(0);
 }
 
 int first(void) {

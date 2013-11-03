@@ -1,32 +1,38 @@
 GIC0: .word 0x1E000000
 TASK_READY: .word 0
+_activate_kernel_restore: .word activate_kernel_restore
 
 .type activate_kernel, %function
 .global activate_kernel
+.global activate_kernel_restore
 activate_kernel:
-	push {r4-r10, fp, ip, lr}
-	mrs r4, CPSR
-	mov r5, #activate_kernel_restore
-	push {r4, r5}
+	cmp r0, #0
+	beq load
+save:
+	push {r0-r10, fp, ip, lr}
+	mrs ip, CPSR
+	ldr lr, _activate_kernel_restore
+	push {ip, lr}
 	str sp, [r0, #0x0]
 
+load:
 	ldr sp, [r1, #0x0]
-	pop {r4, r5}
-	msr SPSR, r4
-	movs pc, r5
+
+	pop {ip, lr}
+	msr SPSR, ip
+	movs pc, lr
 
 activate_kernel_restore:
-	pop {r4-r10, fp, ip, lr}
+	pop {r0-r10, fp, ip, lr}
 	bx lr
 
 .type activate, %function
 .global activate
 activate:
-	mov ip, sp
-	push {r4,r5,r6,r7,r8,r9,r10,fp,ip,lr}
-
 	ldmfd r0!, {ip,lr}
 	msr SPSR, ip
+
+	mov sp, r1
 
 	msr CPSR_c, #0xDF /* System mode */
 	mov sp, r0
@@ -49,10 +55,7 @@ svc_entry:
 	push {r1}
 	bl handle_svc
 	pop {r0}
-
-	pop {r4-r12,lr}
-	mov sp, ip
-	bx lr
+	bl irq_return
 
 .global irq_entry
 irq_entry:
@@ -103,8 +106,4 @@ irq_entry:
 	stmfd r0!, {ip,lr}
 
 	msr CPSR_c, #0xD3 /* Supervisor mode */
-
-	pop {r4-r12,lr}
-	mov sp, ip
-	bx lr
-
+	bl irq_return
