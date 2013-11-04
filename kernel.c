@@ -6,7 +6,7 @@
 #include <user/syscalls.h>
 
 /* Define hypervisor stack */
-unsigned hyp_stack[2048];
+unsigned hyp_stack[1024];
 
 /* Initialize all services and execute user level code */
 void init_systems(void) {
@@ -22,7 +22,7 @@ void init_systems(void) {
 }
 
 /* Initialize all kernel subsystems and run system */
-int main(void) {
+void main(void) {
 	printa("In main %x\n", (unsigned)main);
 	init_int();
 	init_page_alloc();
@@ -32,6 +32,4 @@ int main(void) {
 	add_task(&init_systems);
 
 	schedule();
-
-	return 0;
 }

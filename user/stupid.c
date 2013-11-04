@@ -4,7 +4,7 @@
 volatile int glob = 10,
 	 a = 5, b = 4;
 
-int _start(void) {
+void _start(void) {
 	glob = a + b;
 	uart_puts("Hello from stupid!!!!\n");
 	sys_exit(0);

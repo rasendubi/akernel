@@ -13,7 +13,7 @@ void schedule(void);
 
 typedef struct task_struct {
 	unsigned *kernel_stack;
-	unsigned *kernel_stack_start;
+	unsigned *kernel_stack_begin;
 
 	unsigned *stack;
 	unsigned *stack_start;

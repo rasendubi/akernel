@@ -23,7 +23,10 @@ load:
 	movs pc, lr
 
 activate_kernel_restore:
-	pop {r0-r10, fp, ip, lr}
+	; Discard stored on stack r0
+	; Preserve prev which is stored in r0 and return it from function
+	pop {r1}
+	pop {r1-r10, fp, ip, lr}
 	bx lr
 
 .type activate, %function
