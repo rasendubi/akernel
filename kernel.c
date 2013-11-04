@@ -6,24 +6,23 @@
 #include <user/syscalls.h>
 
 /* Define hypervisor stack */
-unsigned hyp_stack[2048];
+unsigned hyp_stack[1024];
 
 /* Initialize all services and execute user level code */
 void init_systems(void) {
+	printa("In init systems\n");
+
 	if (!sys_fork()) {
-		do {
-			sys_exec("user/services/pipe_master");
-			printa("pipe_master error\n");
-		} while (1);
-	}
-	if (!sys_fork())
+		printa("Starting user/user_first\n");
 		sys_exec("user/user_first");
+		sys_exit(0);
+	}
 
 	while (1);
 }
 
 /* Initialize all kernel subsystems and run system */
-int main(void) {
+void main(void) {
 	printa("In main %x\n", (unsigned)main);
 	init_int();
 	init_page_alloc();
@@ -32,9 +31,5 @@ int main(void) {
 
 	add_task(&init_systems);
 
-	while (1) {
-		schedule();
-	}
-
-	return 0;
+	schedule();
 }
