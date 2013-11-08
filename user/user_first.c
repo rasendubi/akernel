@@ -10,6 +10,7 @@ void _start(void) {
 	if (!sys_fork()) sys_exec("user/irq_test");
 	if (!sys_fork()) sys_exec("user/stupid");
 	if (!sys_fork()) sys_exec("user/alloc_test");
+	if (!sys_fork()) sys_exec("user/slab_alloc_test");
 	if (!sys_fork()) sys_exec("user/print_test");
 	printa("In user mode again\n");
 

@@ -7,7 +7,9 @@
 #define MAX_POWER 10
 #define MAX_SIZE (1 << MAX_POWER)
 
-#ifdef DEBUG_ALLOC
+#define DEBUG_ALLOC 1
+
+#if DEBUG_ALLOC
 	#include <print.h>
 	#define debug(...) printa(__VA_ARGS__)
 #else
@@ -134,9 +136,11 @@ void *slab_realloc(void *addr, size_t size) {
 }
 
 void slab_mem_dump(void) {
+#if DEBUG_ALLOC
+	debug("==========================\nBegin slab dumping\n===========================\n");
     big_object *bo = first_big.next;
     while (bo) {
-        debug("Big object at: %x (%x)\n", bo->start, bo->page_power);
+        debug("Big object at: %p (%x)\n", bo->start, bo->page_power);
         bo = bo->next;
     }
 
@@ -144,4 +148,6 @@ void slab_mem_dump(void) {
         debug("Slab %x\n", i);
         slab_cache_mem_dump(&caches[i]);
     }
+	debug("==========================\nEnd slab dumping\n===========================\n");
+#endif
 }

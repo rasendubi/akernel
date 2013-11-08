@@ -27,6 +27,7 @@ ramdisk.tar: \
 		user/stupid \
 		user/services/pipe_master \
 		user/alloc_test \
+		user/slab_alloc_test \
 		user/print_test \
 		user/irq_test \
 		user/user_first
@@ -37,6 +38,8 @@ user/stupid: user/stupid.o uart.o user/syscalls.o
 user/services/pipe_master: user/services/pipe_master.o user/syscalls.o user/page_alloc.o alloc.o print.o uart.o
 
 user/alloc_test: user/alloc_test.o alloc.o print.o uart.o user/page_alloc.o user/syscalls.o
+
+user/slab_alloc_test: user/slab_alloc_test.o user/syscalls.o print.o uart.o slab.o slab_alloc.o user/page_alloc.o
 
 user/print_test: user/print_test.o user/syscalls.o print.o uart.o
 
@@ -56,6 +59,7 @@ clean:
 		user/*.o \
 		user/stupid \
 		user/alloc_test \
+		user/slab_alloc_test \
 		user/print_test \
 		user/irq_test \
 		user/user_first \

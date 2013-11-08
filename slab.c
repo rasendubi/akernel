@@ -44,7 +44,7 @@ static slab_t *slab_new(size_t size) {
     slab_t *slab = (slab_t *)((unsigned)start + max_objects*size);
     slab->start = start;
     slab->next = NULL;
-    for (int i = 0; i < (max_objects-1)/4*4 + 1; ++i) {
+    for (int i = 0; i < max_objects; ++i) {
         bitarray_set(slab->bitarray, i, 0);
     }
     slab->allocated = 0;
